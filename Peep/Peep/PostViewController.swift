@@ -18,12 +18,17 @@ class PostViewController: UIViewController {
     var socket: SocketIOClient!
     var toReceive: SocketIOClient!
     
+    var deviceId: String!
+    var deviceIdToRecieve: String!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         
         self.socket = toReceive
+        self.deviceId = deviceIdToRecieve
+        
         
         cancelPostButton.target = self
         cancelPostButton.action = "cancelPost:"
@@ -44,8 +49,11 @@ class PostViewController: UIViewController {
     }
     
     @IBAction func post(button: UIBarButtonItem) {
-        //println(textView.text)
-        socket.emit("createPost", textView.text)
+        let postJSON = [
+            "userId": deviceId,
+            "content": textView.text
+        ]
+        socket.emit("createPost", postJSON)
         socket.emit("reloadPosts")
         self.dismissViewControllerAnimated(true, completion: {})
     }

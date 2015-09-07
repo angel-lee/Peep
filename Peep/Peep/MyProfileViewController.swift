@@ -1,5 +1,5 @@
 //
-//  FirstViewController.swift
+//  SecondViewController.swift
 //  Peep
 //
 //  Created by Raymond_Dev on 8/28/15.
@@ -9,27 +9,24 @@
 import UIKit
 import Socket_IO_Client_Swift
 
-class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
+
+class MyProfileViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+
     @IBOutlet var tableView: UITableView!
-    
+
     var app: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
 
+    var socket: SocketIOClient!
+    
     var deviceId: String!
     
     var posts: NSArray! = []
-    
-    let socket = SocketIOClient(socketURL: "192.168.1.4:8000")
-    
+
     func socketHandlers() {
-        socket.on("connect") {data, ack in
-            println("connected to localhost:8000")
-        }
-        
-        socket.on("loadPosts") {data, ack in
+        socket.on("loadMyPosts") {data, ack in
             self.posts = data?[0] as? NSArray
             
-            self.tableView.reloadData()            
+            self.tableView.reloadData()
         }
     }
     
@@ -37,40 +34,19 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        app.socket = self.socket
-        
-        self.deviceId = UIDevice.currentDevice().identifierForVendor.UUIDString
-        app.deviceId = self.deviceId
-        
-        socketHandlers()
-        self.socket.connect()
-        
         self.tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: "refresh:", forControlEvents: .ValueChanged)
-        tableView.addSubview(refreshControl)
+        self.socket = app.socket
         
+        self.socket.emit("loadMyPosts", app.deviceId)
+        
+        socketHandlers()
+
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }
-    
-    func refresh(refreshControl: UIRefreshControl) {
-        socket.emit("reloadPosts")
-        refreshControl.endRefreshing()
-    }
-    
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if(segue.identifier == "newPost") {
-            let nav = segue.destinationViewController as! UINavigationController
-            let postViewController = nav.topViewController as! PostViewController
-            
-            postViewController.toReceive = self.socket
-            postViewController.deviceIdToRecieve = self.deviceId
-        }
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -81,7 +57,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         var cell:UITableViewCell = self.tableView.dequeueReusableCellWithIdentifier("Cell") as! UITableViewCell
         
         cell.textLabel?.text = self.posts[indexPath.row].valueForKey("content") as? String
-                        
+
         return cell
     }
     
