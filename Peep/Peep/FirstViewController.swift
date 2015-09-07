@@ -63,7 +63,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         refreshControl.endRefreshing()
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    /*override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if(segue.identifier == "newPost") {
             let nav = segue.destinationViewController as! UINavigationController
             let postViewController = nav.topViewController as! PostViewController
@@ -71,7 +71,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
             postViewController.toReceive = self.socket
             postViewController.deviceIdToRecieve = self.deviceId
         }
-    }
+    }*/
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.posts.count

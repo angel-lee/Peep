@@ -11,23 +11,23 @@ import Socket_IO_Client_Swift
 
 class PostViewController: UIViewController {
 
+    var app: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+
     @IBOutlet weak var cancelPostButton: UIBarButtonItem!
     @IBOutlet weak var postButton: UIBarButtonItem!
     @IBOutlet weak var textView: UITextView!
     
     var socket: SocketIOClient!
-    var toReceive: SocketIOClient!
     
     var deviceId: String!
-    var deviceIdToRecieve: String!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         
-        self.socket = toReceive
-        self.deviceId = deviceIdToRecieve
+        self.socket = app.socket
+        self.deviceId = app.deviceId
         
         
         cancelPostButton.target = self
