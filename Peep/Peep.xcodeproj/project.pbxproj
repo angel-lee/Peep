@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		62103E5B1B9F37130016E670 /* PostCellTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62103E5A1B9F37130016E670 /* PostCellTableViewCell.swift */; };
 		6235F05C1B925B4C008F176E /* PostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6235F05B1B925B4C008F176E /* PostViewController.swift */; };
 		6251D8FF1B90E42100133FC9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6251D8FE1B90E42100133FC9 /* AppDelegate.swift */; };
 		6251D9011B90E42100133FC9 /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6251D9001B90E42100133FC9 /* FirstViewController.swift */; };
@@ -30,6 +31,7 @@
 
 /* Begin PBXFileReference section */
 		463676BE7D04725DC510C10C /* Pods_Peep.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Peep.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		62103E5A1B9F37130016E670 /* PostCellTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostCellTableViewCell.swift; sourceTree = "<group>"; };
 		6235F05B1B925B4C008F176E /* PostViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostViewController.swift; sourceTree = "<group>"; };
 		6251D8F91B90E42100133FC9 /* Peep.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Peep.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6251D8FD1B90E42100133FC9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -104,6 +106,7 @@
 				6251D9071B90E42100133FC9 /* Images.xcassets */,
 				6251D9091B90E42100133FC9 /* LaunchScreen.xib */,
 				6251D8FC1B90E42100133FC9 /* Supporting Files */,
+				62103E5A1B9F37130016E670 /* PostCellTableViewCell.swift */,
 			);
 			path = Peep;
 			sourceTree = "<group>";
@@ -296,6 +299,7 @@
 				6235F05C1B925B4C008F176E /* PostViewController.swift in Sources */,
 				6251D9031B90E42100133FC9 /* MyProfileViewController.swift in Sources */,
 				6251D8FF1B90E42100133FC9 /* AppDelegate.swift in Sources */,
+				62103E5B1B9F37130016E670 /* PostCellTableViewCell.swift in Sources */,
 				6251D9011B90E42100133FC9 /* FirstViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

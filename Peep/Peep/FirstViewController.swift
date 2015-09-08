@@ -15,11 +15,13 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     var app: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
 
-    var deviceId: String!
+    let cellIdentifier: String = "postContentCell"
     
+    var deviceId: String!
+   
     var posts: NSArray! = []
     
-    let socket = SocketIOClient(socketURL: "192.168.1.4:8000")
+    let socket = SocketIOClient(socketURL: "localhost:8000")
     
     func socketHandlers() {
         socket.on("connect") {data, ack in
@@ -45,7 +47,9 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         socketHandlers()
         self.socket.connect()
         
-        self.tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        //self.tableView.estimatedRowHeight = 200
+        
+        //self.tableView.registerClass(PostCellTableViewCell.self, forCellReuseIdentifier: cellIdentifier)
         
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: "refresh:", forControlEvents: .ValueChanged)
@@ -73,22 +77,71 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
     }*/
     
+    
+//    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+//        var cell:PostCellTableViewCell = self.tableView.dequeueReusableCellWithIdentifier("postContentCell") as! UITableViewCell
+//        
+//        //cell.textLabel?.text = self.posts[indexPath.row].valueForKey("content") as? String
+//        cell.postContent?.text = self.posts[indexPath.row] as? String
+//
+//        
+//        return cell
+//    }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.posts.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        var cell:UITableViewCell = self.tableView.dequeueReusableCellWithIdentifier("Cell") as! UITableViewCell
+        return postCellAtIndexPath(indexPath)
+    }
+    
+    func postCellAtIndexPath(indexPath: NSIndexPath) -> PostCellTableViewCell {
+        var cell:PostCellTableViewCell = self.tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as! PostCellTableViewCell
         
-        cell.textLabel?.text = self.posts[indexPath.row].valueForKey("content") as? String
-                        
+        self.configureBasicCell(cell, atIndexPath: indexPath)
+        
         return cell
+        
+    }
+    
+    func configureBasicCell(cell: PostCellTableViewCell, atIndexPath indexPath: NSIndexPath) {
+        var item: AnyObject = self.posts[indexPath.row]
+        self.setPostContentForCell(cell, item: item)
+    }
+    
+    func setPostContentForCell(cell: PostCellTableViewCell, item: AnyObject) {
+        var content: String = item.valueForKey("content") as! String
+        cell.postContent?.text = content
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         println("You selected cell #\(indexPath.row)!")
     }
-
-
+    
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return heightForBasicCellAtIndexPath(indexPath)
+    }
+    
+    func heightForBasicCellAtIndexPath(indexPath: NSIndexPath) -> CGFloat {
+        var sizingCell: PostCellTableViewCell!
+         var token: dispatch_once_t = 0
+        
+        dispatch_once(&token, { () -> Void in
+            sizingCell = self.tableView.dequeueReusableCellWithIdentifier(self.cellIdentifier) as! PostCellTableViewCell
+        })
+        
+        self.configureBasicCell(sizingCell, atIndexPath: indexPath)
+        return self.calculateHeightForConfiguredSizingCell(sizingCell)
+    }
+    
+    func calculateHeightForConfiguredSizingCell(sizingCell: UITableViewCell) -> CGFloat {
+        sizingCell.setNeedsLayout()
+        sizingCell.layoutIfNeeded()
+        
+        var size: CGSize = sizingCell.contentView.systemLayoutSizeFittingSize(UILayoutFittingCompressedSize)
+        return size.height
+    }
+    
 }
 
