@@ -36,6 +36,7 @@ var postSchema = mongoose.Schema({
 	userId: String,
 	content: String,
 	likes: {type: Number, default: 0},
+	likers: [String],
 	hashtags: [String],
 	comments: [
 		{	
@@ -94,6 +95,41 @@ function createPost(post) {
 		});
 }
 
+function likePost(thePost) {
+	PostModel.findById(thePost.postId, function(err, post) {
+		if (err) {
+			return handleError(err);
+		}
+		//console.log(post);
+		post.likes++;
+		post.likers.push(thePost.userId);
+		post.save(function(err) {
+			if (err) {
+				return handleError(err);
+			}
+			//console.log(post.likers);
+			console.log("post now has " + post.likes + " likes");
+		});
+	});
+}
+
+function unlikePost(thePost) {
+	PostModel.findById(thePost.postId, function(err, post) {
+		if (err) {
+			return handleError(err);
+		}
+		post.likes--;
+		post.likers.pop(thePost.postId);
+		post.save(function(err) {
+			if (err) {
+				return handleError(err);
+			}
+			//console.log(post.likers);
+			console.log("post now has " + post.likes + " likes");
+		});
+	});
+}
+
 io.on('connection', function(socket) {
 	numConnectedClients++;
 	console.log(numConnectedClients + ' clients connected');
@@ -115,5 +151,11 @@ io.on('connection', function(socket) {
 
 	socket.on('loadMyPosts', function(pstId) {
 		loadMyPosts(socket, pstId);		
+	});
+	socket.on('likePost', function(pstId) {
+		likePost(pstId);
+	});
+	socket.on('unlikePost', function(pstId) {
+		unlikePost(pstId);
 	});
 });

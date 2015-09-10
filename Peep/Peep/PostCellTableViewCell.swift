@@ -12,7 +12,14 @@ class PostCellTableViewCell: UITableViewCell {
     
     @IBOutlet weak var postContent: UILabel!
     @IBOutlet weak var myPostAndCommentContent: UILabel!
-
+    @IBOutlet weak var numOfLikes: UILabel!
+    
+    @IBOutlet weak var likeButton: UIButton!
+    
+    var likesInt: Int!
+    var isLiked: Bool!
+    var likers: NSArray!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

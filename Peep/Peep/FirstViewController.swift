@@ -12,7 +12,7 @@ import Socket_IO_Client_Swift
 class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet var tableView: UITableView!
-    
+        
     var app: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
 
     let cellIdentifier: String = "postContentCell"
@@ -88,6 +88,51 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //        return cell
 //    }
     
+    func likePost(sender:UIButton) {
+        var buttonPosition: CGPoint = sender.convertPoint(CGPointZero, toView: self.tableView)
+        var indexPath: NSIndexPath = self.tableView.indexPathForRowAtPoint(buttonPosition)!
+        var cell: PostCellTableViewCell = self.tableView.cellForRowAtIndexPath(indexPath) as! PostCellTableViewCell
+        
+        var postId: String = self.posts[indexPath.row].valueForKey("_id") as! String
+        
+        var postIdAndUserId = [
+            "postId": postId,
+            "userId": app.deviceId
+        ]
+        
+        if (sender.titleLabel?.text == "like") {
+            sender.setTitle("unlike", forState: UIControlState.Normal)
+            
+            socket.emit("likePost", postIdAndUserId)
+            
+            cell.likesInt? += 1
+            cell.numOfLikes?.text = String(cell.likesInt)
+        }
+            
+        else if (sender.titleLabel?.text == "unlike") {
+            sender.setTitle("like", forState: UIControlState.Normal)
+
+            socket.emit("unlikePost", postIdAndUserId)
+            
+            cell.likesInt? -= 1
+            cell.numOfLikes?.text = String(cell.likesInt)
+        }
+    }
+    
+    func checkIfIveLikedPost(cell: PostCellTableViewCell, item: AnyObject) {
+        println("checkIfIveLikedPosts")
+        
+        var likersPerPost: NSArray = item.valueForKey("likers") as! NSArray
+        println(likersPerPost)
+        
+        if (likersPerPost.containsObject(app.deviceId)) {
+            cell.likeButton.setTitle("unlike", forState: UIControlState.Normal)
+        }
+        else {
+            cell.likeButton.setTitle("like", forState: UIControlState.Normal)
+        }
+    }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.posts.count
     }
@@ -101,6 +146,8 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         self.configureBasicCell(cell, atIndexPath: indexPath)
         
+        cell.likeButton.addTarget(self, action: "likePost:", forControlEvents: UIControlEvents.TouchUpInside)
+        
         return cell
         
     }
@@ -108,11 +155,15 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func configureBasicCell(cell: PostCellTableViewCell, atIndexPath indexPath: NSIndexPath) {
         var item: AnyObject = self.posts[indexPath.row]
         self.setPostContentForCell(cell, item: item)
+        self.checkIfIveLikedPost(cell, item: item)
     }
     
     func setPostContentForCell(cell: PostCellTableViewCell, item: AnyObject) {
         var content: String = item.valueForKey("content") as! String
+        cell.likesInt = item.valueForKey("likes") as! Int
+        
         cell.postContent?.text = content
+        cell.numOfLikes?.text = String(cell.likesInt)
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
@@ -125,7 +176,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     func heightForBasicCellAtIndexPath(indexPath: NSIndexPath) -> CGFloat {
         var sizingCell: PostCellTableViewCell!
-         var token: dispatch_once_t = 0
+        var token: dispatch_once_t = 0
         
         dispatch_once(&token, { () -> Void in
             sizingCell = self.tableView.dequeueReusableCellWithIdentifier(self.cellIdentifier) as! PostCellTableViewCell
