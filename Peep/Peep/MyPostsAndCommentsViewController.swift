@@ -10,7 +10,7 @@ import UIKit
 import Socket_IO_Client_Swift
 
 
-class MyProfileViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class MyPostsAndCommentsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet var tableView: UITableView!
 

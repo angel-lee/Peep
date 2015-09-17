@@ -21,7 +21,10 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
    
     var posts: NSArray! = []
     
-    let socket = SocketIOClient(socketURL: "localhost:8000")
+    let hashtagRegex = "#[A-Za-z0-9]+"
+    
+    //let socket = SocketIOClient(socketURL: "10.136.94.59:8000")
+    let socket = SocketIOClient(socketURL: "http://ec2-52-89-43-120.us-west-2.compute.amazonaws.com:8080")
     
     func socketHandlers() {
         socket.on("connect") {data, ack in
@@ -88,6 +91,42 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //        return cell
 //    }
     
+//    func findHashtags(cell: PostCellTableViewCell, atIndexPath indexPath: NSIndexPath) {
+//        var stringToSearch: String = cell.postContent.text!
+//        
+//        let secondAttributes = [NSForegroundColorAttributeName: UIColor.redColor(), NSBackgroundColorAttributeName: UIColor.blueColor(), NSUnderlineStyleAttributeName: 1]
+//        
+//        let mutableString = NSMutableAttributedString(string: stringToSearch)
+//        
+//        if let match = stringToSearch.rangeOfString(self.hashtagRegex, options: .RegularExpressionSearch) {
+//            println("hashtag " + match.description)
+//            
+//            mutableString.addAttributes(secondAttributes, range: stringToSearch.rangeOfString("Hey"))
+//            
+//        }
+//        
+//        
+//        
+//    }
+    
+    func findHashtags(cell: PostCellTableViewCell, atIndexPath indexPath: NSIndexPath) {
+        var string = NSMutableAttributedString(string: cell.postContent.text!)
+        var words: NSArray = cell.postContent.text!.componentsSeparatedByString(" ")
+        
+        var nsstring: NSString = NSString(string: cell.postContent.text!)
+        
+        for word: NSString in words as! [NSString] {
+            //if (word.hasPrefix("#")) {
+                //var range: NSRange = nsstring.rangeOfString(word as String)
+                var range: NSRange = nsstring.rangeOfString(hashtagRegex, options: .RegularExpressionSearch)
+            
+                string.addAttribute(NSForegroundColorAttributeName, value: UIColor.redColor(), range: range)
+            //}
+        }
+        
+        cell.postContent?.attributedText = string
+    }
+    
     func likePost(sender:UIButton) {
         var buttonPosition: CGPoint = sender.convertPoint(CGPointZero, toView: self.tableView)
         var indexPath: NSIndexPath = self.tableView.indexPathForRowAtPoint(buttonPosition)!
@@ -120,10 +159,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func checkIfIveLikedPost(cell: PostCellTableViewCell, item: AnyObject) {
-        println("checkIfIveLikedPosts")
-        
         var likersPerPost: NSArray = item.valueForKey("likers") as! NSArray
-        println(likersPerPost)
         
         if (likersPerPost.containsObject(app.deviceId)) {
             cell.likeButton.setTitle("unlike", forState: UIControlState.Normal)
@@ -145,6 +181,8 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         var cell:PostCellTableViewCell = self.tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as! PostCellTableViewCell
         
         self.configureBasicCell(cell, atIndexPath: indexPath)
+        
+        findHashtags(cell, atIndexPath: indexPath)
         
         cell.likeButton.addTarget(self, action: "likePost:", forControlEvents: UIControlEvents.TouchUpInside)
         

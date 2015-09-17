@@ -248,10 +248,10 @@
             </objects>
             <point key="canvasLocation" x="2325" y="-320"/>
         </scene>
-        <!--My Profile View Controller-->
+        <!--My Posts And Comments View Controller-->
         <scene sceneID="NZI-zb-43B">
             <objects>
-                <viewController id="CC5-1J-Zkh" customClass="MyProfileViewController" customModule="Peep" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="CC5-1J-Zkh" customClass="MyPostsAndCommentsViewController" customModule="Peep" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="agY-pa-JH6"/>
                         <viewControllerLayoutGuide type="bottom" id="UFn-id-iOF"/>

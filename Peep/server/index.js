@@ -43,13 +43,13 @@ var postSchema = mongoose.Schema({
 			userId: String,
 			content: String,
 			likes: Number,
+			likers: [String],
 			timeCreated: {type: Date, default: Date.now}
 		}
 	],
 	timeCreated: {type: Date, default: Date.now}
 }, {'autoIndex': false});
 
-//postSchema.set('autoIndex', false);
 
 var PostModel = mongoose.model('Post', postSchema);
 
@@ -100,14 +100,12 @@ function likePost(thePost) {
 		if (err) {
 			return handleError(err);
 		}
-		//console.log(post);
 		post.likes++;
 		post.likers.push(thePost.userId);
 		post.save(function(err) {
 			if (err) {
 				return handleError(err);
 			}
-			//console.log(post.likers);
 			console.log("post now has " + post.likes + " likes");
 		});
 	});
@@ -124,7 +122,6 @@ function unlikePost(thePost) {
 			if (err) {
 				return handleError(err);
 			}
-			//console.log(post.likers);
 			console.log("post now has " + post.likes + " likes");
 		});
 	});
