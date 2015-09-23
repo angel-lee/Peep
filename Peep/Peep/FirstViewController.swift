@@ -22,13 +22,14 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     var posts: NSArray! = []
     
     let hashtagRegex = "#[A-Za-z0-9]+"
+    //let hashtagRegex = "\\s*#(?:\\[[^\\]]+\\]|\\s+)"
     
-    //let socket = SocketIOClient(socketURL: "10.136.94.59:8000")
-    let socket = SocketIOClient(socketURL: "http://ec2-52-89-43-120.us-west-2.compute.amazonaws.com:8080")
+    let socket = SocketIOClient(socketURL: "localhost:8000")
+    //let socket = SocketIOClient(socketURL: "http://ec2-52-89-43-120.us-west-2.compute.amazonaws.com:8080")
     
     func socketHandlers() {
         socket.on("connect") {data, ack in
-            println("connected to localhost:8000")
+            print("connected to ec2:8080")
         }
         
         socket.on("loadPosts") {data, ack in
@@ -44,7 +45,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         app.socket = self.socket
         
-        self.deviceId = UIDevice.currentDevice().identifierForVendor.UUIDString
+        self.deviceId = UIDevice.currentDevice().identifierForVendor!.UUIDString
         app.deviceId = self.deviceId
         
         socketHandlers()
@@ -68,6 +69,19 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func refresh(refreshControl: UIRefreshControl) {
         socket.emit("reloadPosts")
         refreshControl.endRefreshing()
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if(segue.identifier == "showDetailPostAndComments") {
+            let indexPath: NSIndexPath = self.tableView.indexPathForSelectedRow!
+            let destinationViewController: PostDetailAndCommentViewController = segue.destinationViewController as! PostDetailAndCommentViewController
+            
+            destinationViewController.detailContent = posts[indexPath.row].valueForKey("content") as! String
+            //destinationViewController.comments = posts[indexPath.row].valueForKey("comments") as! NSArray
+            destinationViewController.postId = posts[indexPath.row].valueForKey("_id") as! String
+            
+            //destinationViewController.hidesBottomBarWhenPushed = true
+        }
     }
     
     /*override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -109,32 +123,39 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //        
 //    }
     
+    func hashtagTapped() {
+        print("tapped hashtag")
+    }
+    
     func findHashtags(cell: PostCellTableViewCell, atIndexPath indexPath: NSIndexPath) {
-        var string = NSMutableAttributedString(string: cell.postContent.text!)
-        var words: NSArray = cell.postContent.text!.componentsSeparatedByString(" ")
+        let string = NSMutableAttributedString(string: cell.postContent.text!)
+        let words: NSArray = cell.postContent.text!.componentsSeparatedByString(" ")
         
-        var nsstring: NSString = NSString(string: cell.postContent.text!)
+        let nsstring: NSString = NSString(string: cell.postContent.text!)
         
         for word: NSString in words as! [NSString] {
-            //if (word.hasPrefix("#")) {
-                //var range: NSRange = nsstring.rangeOfString(word as String)
-                var range: NSRange = nsstring.rangeOfString(hashtagRegex, options: .RegularExpressionSearch)
+            //print(word)
+            if (word.hasPrefix("#")) {
+                let range: NSRange = nsstring.rangeOfString(word as String)
+                //let range: NSRange = nsstring.rangeOfString(hashtagRegex, options: .RegularExpressionSearch)
+                //print(range)
             
                 string.addAttribute(NSForegroundColorAttributeName, value: UIColor.redColor(), range: range)
-            //}
+                //string.addAttribute(NSLinkAttributeName, value: "hashtagTapped:", range: range)
+            }
         }
         
         cell.postContent?.attributedText = string
     }
     
     func likePost(sender:UIButton) {
-        var buttonPosition: CGPoint = sender.convertPoint(CGPointZero, toView: self.tableView)
-        var indexPath: NSIndexPath = self.tableView.indexPathForRowAtPoint(buttonPosition)!
-        var cell: PostCellTableViewCell = self.tableView.cellForRowAtIndexPath(indexPath) as! PostCellTableViewCell
+        let buttonPosition: CGPoint = sender.convertPoint(CGPointZero, toView: self.tableView)
+        let indexPath: NSIndexPath = self.tableView.indexPathForRowAtPoint(buttonPosition)!
+        let cell: PostCellTableViewCell = self.tableView.cellForRowAtIndexPath(indexPath) as! PostCellTableViewCell
         
-        var postId: String = self.posts[indexPath.row].valueForKey("_id") as! String
+        let postId: String = self.posts[indexPath.row].valueForKey("_id") as! String
         
-        var postIdAndUserId = [
+        let postIdAndUserId = [
             "postId": postId,
             "userId": app.deviceId
         ]
@@ -159,7 +180,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func checkIfIveLikedPost(cell: PostCellTableViewCell, item: AnyObject) {
-        var likersPerPost: NSArray = item.valueForKey("likers") as! NSArray
+        let likersPerPost: NSArray = item.valueForKey("likers") as! NSArray
         
         if (likersPerPost.containsObject(app.deviceId)) {
             cell.likeButton.setTitle("unlike", forState: UIControlState.Normal)
@@ -178,7 +199,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func postCellAtIndexPath(indexPath: NSIndexPath) -> PostCellTableViewCell {
-        var cell:PostCellTableViewCell = self.tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as! PostCellTableViewCell
+        let cell:PostCellTableViewCell = self.tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as! PostCellTableViewCell
         
         self.configureBasicCell(cell, atIndexPath: indexPath)
         
@@ -191,21 +212,21 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func configureBasicCell(cell: PostCellTableViewCell, atIndexPath indexPath: NSIndexPath) {
-        var item: AnyObject = self.posts[indexPath.row]
+        let item: AnyObject = self.posts[indexPath.row]
         self.setPostContentForCell(cell, item: item)
         self.checkIfIveLikedPost(cell, item: item)
     }
     
     func setPostContentForCell(cell: PostCellTableViewCell, item: AnyObject) {
-        var content: String = item.valueForKey("content") as! String
+        let content: String = item.valueForKey("content") as! String
         cell.likesInt = item.valueForKey("likes") as! Int
-        
+                
         cell.postContent?.text = content
         cell.numOfLikes?.text = String(cell.likesInt)
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        println("You selected cell #\(indexPath.row)!")
+        //print("You selected cell #\(indexPath.row)!")
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
@@ -228,7 +249,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         sizingCell.setNeedsLayout()
         sizingCell.layoutIfNeeded()
         
-        var size: CGSize = sizingCell.contentView.systemLayoutSizeFittingSize(UILayoutFittingCompressedSize)
+        let size: CGSize = sizingCell.contentView.systemLayoutSizeFittingSize(UILayoutFittingCompressedSize)
         return size.height
     }
     

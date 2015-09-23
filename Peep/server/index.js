@@ -42,7 +42,7 @@ var postSchema = mongoose.Schema({
 		{	
 			userId: String,
 			content: String,
-			likes: Number,
+			likes: {type: Number, default: 0},
 			likers: [String],
 			timeCreated: {type: Date, default: Date.now}
 		}
@@ -52,6 +52,20 @@ var postSchema = mongoose.Schema({
 
 
 var PostModel = mongoose.model('Post', postSchema);
+
+function createPost(post) {
+	var newPost = new PostModel({userId: post.userId, content: post.content});
+
+		newPost.save(function(err) {
+			if(err) {
+				throw err;
+			}
+			else {
+				console.log(newPost + ' saved to db!');
+				//socket.emit('postSaved', newPost);
+			}
+		});
+}
 
 function loadPosts(socket, post) {
 	var query = PostModel.find({});
@@ -80,19 +94,6 @@ function loadMyPosts(socket, postId) {
 
 		socket.emit('loadMyPosts', docs);
 	});
-}
-
-function createPost(post) {
-	var newPost = new PostModel({userId: post.userId, content: post.content});
-
-		newPost.save(function(err) {
-			if(err) {
-				throw err;
-			}
-			else {
-				console.log(newPost + ' saved to db!');
-			}
-		});
 }
 
 function likePost(thePost) {
@@ -127,6 +128,50 @@ function unlikePost(thePost) {
 	});
 }
 
+function createComment(socket, theComment) {
+	PostModel.findById(theComment.postId, function(err, post) {
+		if(err) {
+			return handleError(err);
+		}
+
+		var newComment = {userId: theComment.userId,
+						content: theComment.content};
+
+		post.comments.push(newComment);
+
+		post.save(function(err) {
+			if(err) {
+				return handleError(err);
+			}
+			console.log('comment saved to post ' + '[' + post.content + ']');
+			socket.emit('commentSaved', post.comments);
+		});
+
+	});
+}
+
+function loadComments(socket, postId) {
+	PostModel.findById(postId, function(err, post) {
+		if(err) {
+			return handleError(err);
+		}
+		console.log('loading comments for post ' + '[' + post.content + ']');
+		socket.emit('loadComments', post.comments);
+	});
+}
+
+function loadMyComments(socket, commentId) {
+	
+}
+
+function likeComment(theComment) {
+
+}
+
+function unlikeComment(theComment) {
+	
+}
+
 io.on('connection', function(socket) {
 	numConnectedClients++;
 	console.log(numConnectedClients + ' clients connected');
@@ -142,6 +187,10 @@ io.on('connection', function(socket) {
 		createPost(pst);
 	});
 
+	socket.on('createComment', function(post) {
+		createComment(socket, post);
+	});
+
 	socket.on('reloadPosts', function() {
 		loadPosts(socket);
 	});
@@ -149,6 +198,11 @@ io.on('connection', function(socket) {
 	socket.on('loadMyPosts', function(pstId) {
 		loadMyPosts(socket, pstId);		
 	});
+
+	socket.on('loadComments', function(pstId) {
+		loadComments(socket, pstId);
+	});
+
 	socket.on('likePost', function(pstId) {
 		likePost(pstId);
 	});

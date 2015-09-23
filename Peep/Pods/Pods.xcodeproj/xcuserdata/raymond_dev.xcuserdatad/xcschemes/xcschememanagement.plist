@@ -4,12 +4,12 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>Pods-Peep-Socket.IO-Client-Swift.xcscheme</key>
+		<key>Pods-Peep.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Pods-Peep.xcscheme</key>
+		<key>Socket.IO-Client-Swift.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -17,12 +17,12 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>52D6A9D6398239709401775D</key>
+		<key>B2B4B6047C5F67A5375E7465E5D5F30F</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>E0949A8A02875B798F9AB6C6</key>
+		<key>EAD62B79AE41F67690E0F44EA29AD60C</key>
 		<dict>
 			<key>primary</key>
 			<true/>

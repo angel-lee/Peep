@@ -77,7 +77,7 @@ class MyPostsAndCommentsViewController: UIViewController, UITableViewDelegate, U
     }
     
     func postCellAtIndexPath(indexPath: NSIndexPath) -> PostCellTableViewCell {
-        var cell:PostCellTableViewCell = self.tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as! PostCellTableViewCell
+        let cell:PostCellTableViewCell = self.tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as! PostCellTableViewCell
         
         self.configureBasicCell(cell, atIndexPath: indexPath)
         
@@ -86,17 +86,17 @@ class MyPostsAndCommentsViewController: UIViewController, UITableViewDelegate, U
     }
     
     func configureBasicCell(cell: PostCellTableViewCell, atIndexPath indexPath: NSIndexPath) {
-        var item: AnyObject = self.posts[indexPath.row]
+        let item: AnyObject = self.posts[indexPath.row]
         self.setPostContentForCell(cell, item: item)
     }
     
     func setPostContentForCell(cell: PostCellTableViewCell, item: AnyObject) {
-        var content: String = item.valueForKey("content") as! String
+        let content: String = item.valueForKey("content") as! String
         cell.myPostAndCommentContent?.text = content
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        println("You selected cell #\(indexPath.row)!")
+        print("You selected cell #\(indexPath.row)!")
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
@@ -119,7 +119,7 @@ class MyPostsAndCommentsViewController: UIViewController, UITableViewDelegate, U
         sizingCell.setNeedsLayout()
         sizingCell.layoutIfNeeded()
         
-        var size: CGSize = sizingCell.contentView.systemLayoutSizeFittingSize(UILayoutFittingCompressedSize)
+        let size: CGSize = sizingCell.contentView.systemLayoutSizeFittingSize(UILayoutFittingCompressedSize)
         return size.height
     }
 
