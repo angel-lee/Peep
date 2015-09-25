@@ -1,12 +1,12 @@
 var app = require('http').createServer();
 
-app.listen('8000', function() {
-	console.log('listening on localhost:8000');
-});
-
-// app.listen(8000, '192.168.1.4', function() {
-// 	console.log('listening on 192.168.1.4:8000');
+// app.listen('8000', function() {
+// 	console.log('listening on localhost:8000');
 // });
+
+app.listen(8000, '192.168.1.2', function() {
+	console.log('listening on 192.168.1.4:8000');
+});
 
 var io = require('socket.io')(app);
 
@@ -14,7 +14,7 @@ var mongoose = require('mongoose');
 
 var numConnectedClients = 0;
 
-mongoose.connect('mongodb://localhost/PeepTestData', function(err) {
+mongoose.connect('mongodb://192.168.1.2/PeepTestData', function(err) {
 	if(err) {
 		console.log(err);
 	}

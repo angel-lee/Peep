@@ -24,7 +24,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     let hashtagRegex = "#[A-Za-z0-9]+"
     //let hashtagRegex = "\\s*#(?:\\[[^\\]]+\\]|\\s+)"
     
-    let socket = SocketIOClient(socketURL: "localhost:8000")
+    let socket = SocketIOClient(socketURL: "192.168.1.2:8000")
     //let socket = SocketIOClient(socketURL: "http://ec2-52-89-43-120.us-west-2.compute.amazonaws.com:8080")
     
     func socketHandlers() {
