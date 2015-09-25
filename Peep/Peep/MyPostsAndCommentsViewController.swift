@@ -68,6 +68,19 @@ class MyPostsAndCommentsViewController: UIViewController, UITableViewDelegate, U
 //        println("You selected cell #\(indexPath.row)!")
 //    }
     
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if(segue.identifier == "showDetailPostAndComments") {
+            let indexPath: NSIndexPath = self.tableView.indexPathForSelectedRow!
+            let destinationViewController: PostDetailAndCommentViewController = segue.destinationViewController as! PostDetailAndCommentViewController
+            
+            destinationViewController.detailContent = posts[indexPath.row].valueForKey("content") as! String
+            //destinationViewController.comments = posts[indexPath.row].valueForKey("comments") as! NSArray
+            destinationViewController.postId = posts[indexPath.row].valueForKey("_id") as! String
+            
+            //destinationViewController.hidesBottomBarWhenPushed = true
+        }
+    }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.posts.count
     }
