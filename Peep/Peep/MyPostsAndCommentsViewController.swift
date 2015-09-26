@@ -23,9 +23,17 @@ class MyPostsAndCommentsViewController: UIViewController, UITableViewDelegate, U
     var deviceId: String!
     
     var posts: NSArray! = []
+    
+    var serverRequest: String!
 
     func socketHandlers() {
         socket.on("loadMyPosts") {data, ack in
+            self.posts = data?[0] as? NSArray
+            
+            self.tableView.reloadData()
+        }
+        
+        socket.on("loadMyComments") {data, ack in
             self.posts = data?[0] as? NSArray
             
             self.tableView.reloadData()
@@ -40,7 +48,7 @@ class MyPostsAndCommentsViewController: UIViewController, UITableViewDelegate, U
         
         self.socket = app.socket
         
-        self.socket.emit("loadMyPosts", app.deviceId)
+        self.socket.emit(serverRequest, app.deviceId)
         
         socketHandlers()
 
@@ -76,8 +84,19 @@ class MyPostsAndCommentsViewController: UIViewController, UITableViewDelegate, U
             destinationViewController.detailContent = posts[indexPath.row].valueForKey("content") as! String
             //destinationViewController.comments = posts[indexPath.row].valueForKey("comments") as! NSArray
             destinationViewController.postId = posts[indexPath.row].valueForKey("_id") as! String
-            
+            destinationViewController.originalPosterId = posts[indexPath.row].valueForKey("userId") as! String
             //destinationViewController.hidesBottomBarWhenPushed = true
+        }
+    }
+    
+    func checkIfIveLikedPost(cell: PostCellTableViewCell, item: AnyObject) {
+        let likersPerPost: NSArray = item.valueForKey("likers") as! NSArray
+        
+        if (likersPerPost.containsObject(app.deviceId)) {
+            cell.likeButton.setTitle("unlike", forState: UIControlState.Normal)
+        }
+        else {
+            cell.likeButton.setTitle("like", forState: UIControlState.Normal)
         }
     }
     
@@ -101,11 +120,15 @@ class MyPostsAndCommentsViewController: UIViewController, UITableViewDelegate, U
     func configureBasicCell(cell: PostCellTableViewCell, atIndexPath indexPath: NSIndexPath) {
         let item: AnyObject = self.posts[indexPath.row]
         self.setPostContentForCell(cell, item: item)
+        self.checkIfIveLikedPost(cell, item: item)
     }
     
     func setPostContentForCell(cell: PostCellTableViewCell, item: AnyObject) {
         let content: String = item.valueForKey("content") as! String
+        let numLikes: Int = item.valueForKey("likes") as! Int
+        
         cell.myPostAndCommentContent?.text = content
+        cell.numOfLikes?.text = String(numLikes)
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {

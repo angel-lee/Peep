@@ -24,7 +24,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     let hashtagRegex = "#[A-Za-z0-9]+"
     //let hashtagRegex = "\\s*#(?:\\[[^\\]]+\\]|\\s+)"
     
-    let socket = SocketIOClient(socketURL: "192.168.1.2:8000")
+    let socket = SocketIOClient(socketURL: "localhost:8000")
     //let socket = SocketIOClient(socketURL: "http://ec2-52-89-43-120.us-west-2.compute.amazonaws.com:8080")
     
     func socketHandlers() {
@@ -79,6 +79,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
             destinationViewController.detailContent = posts[indexPath.row].valueForKey("content") as! String
             //destinationViewController.comments = posts[indexPath.row].valueForKey("comments") as! NSArray
             destinationViewController.postId = posts[indexPath.row].valueForKey("_id") as! String
+            destinationViewController.originalPosterId = posts[indexPath.row].valueForKey("userId") as! String
             
             //destinationViewController.hidesBottomBarWhenPushed = true
         }

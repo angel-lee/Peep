@@ -1,12 +1,12 @@
 var app = require('http').createServer();
 
-// app.listen('8000', function() {
-// 	console.log('listening on localhost:8000');
-// });
-
-app.listen(8000, '192.168.1.2', function() {
-	console.log('listening on 192.168.1.4:8000');
+app.listen('8000', function() {
+	console.log('listening on localhost:8000');
 });
+
+// app.listen(8000, '192.168.1.2', function() {
+// 	console.log('listening on 192.168.1.4:8000');
+// });
 
 var io = require('socket.io')(app);
 
@@ -14,7 +14,7 @@ var mongoose = require('mongoose');
 
 var numConnectedClients = 0;
 
-mongoose.connect('mongodb://192.168.1.2/PeepTestData', function(err) {
+mongoose.connect('mongodb://localhost/PeepTestData', function(err) {
 	if(err) {
 		console.log(err);
 	}
@@ -101,14 +101,21 @@ function likePost(thePost) {
 		if (err) {
 			return handleError(err);
 		}
-		post.likes++;
-		post.likers.push(thePost.userId);
-		post.save(function(err) {
-			if (err) {
-				return handleError(err);
-			}
-			console.log("post now has " + post.likes + " likes");
-		});
+
+		if(post.likers.indexOf(thePost.userId) == -1) {
+			post.likes++;
+			post.likers.push(thePost.userId);
+			post.save(function(err) {
+				if (err) {
+					return handleError(err);
+				}
+				console.log("post now has " + post.likes + " likes");
+			});
+		}
+
+		else {
+			console.log('already liked post');
+		}
 	});
 }
 
@@ -117,14 +124,21 @@ function unlikePost(thePost) {
 		if (err) {
 			return handleError(err);
 		}
-		post.likes--;
-		post.likers.pop(thePost.postId);
-		post.save(function(err) {
-			if (err) {
+
+		if(post.likers.indexOf(thePost.userId) != -1) {
+			post.likes--;
+			post.likers.pop(thePost.postId);
+			post.save(function(err) {
+				if (err) {
 				return handleError(err);
-			}
-			console.log("post now has " + post.likes + " likes");
-		});
+				}
+				console.log("post now has " + post.likes + " likes");
+			});
+		}
+
+		else {
+			console.log('already unliked post');
+		}
 	});
 }
 
@@ -161,7 +175,15 @@ function loadComments(socket, postId) {
 }
 
 function loadMyComments(socket, commentId) {
-	
+	var query = PostModel.find({'comments.userId': commentId});
+
+	query.sort('-timeCreated').exec(function(err, posts) {
+		if(err) {
+			handleError(err);
+		}
+		console.log('loading posts I\'ve commented on');
+		socket.emit('loadMyComments', posts);
+	});
 }
 
 function likeComment(theComment) {
@@ -201,6 +223,10 @@ io.on('connection', function(socket) {
 
 	socket.on('loadComments', function(pstId) {
 		loadComments(socket, pstId);
+	});
+
+	socket.on('loadMyComments', function(pstId) {
+		loadMyComments(socket, pstId);
 	});
 
 	socket.on('likePost', function(pstId) {

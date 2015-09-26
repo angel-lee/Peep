@@ -32,6 +32,8 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
     
     var postId: String!
     
+    var originalPosterId: String!
+    
     func socketHandlers() {
         socket.on("loadComments") {data, ack in
             
@@ -50,6 +52,8 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        print(originalPosterId)
         
         self.deviceId = app.deviceId
         self.socket = app.socket
@@ -99,6 +103,15 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         refreshControl.endRefreshing()
     }
     
+    func checkIfMyComment(cell: PostCommentCell, item: AnyObject) {
+        let commenterId: String = item.valueForKey("userId") as! String
+        
+        if(commenterId == self.originalPosterId) {
+            cell.postCommentsContent.textColor = UIColor.redColor()
+        }
+        
+    }
+    
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         //print(self.comments.count)
@@ -122,6 +135,7 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
     func configureBasicCell(cell: PostCommentCell, atIndexPath indexPath: NSIndexPath) {
         let comment: AnyObject = self.comments[indexPath.row]
         self.setPostContentForCell(cell, item: comment)
+        self.checkIfMyComment(cell, item: comment)
     }
     
     func setPostContentForCell(cell: PostCommentCell, item: AnyObject) {
