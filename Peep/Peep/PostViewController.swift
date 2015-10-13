@@ -55,7 +55,7 @@ class PostViewController: UIViewController {
             "hashtags": findHashtags()
         ]
         socket.emit("createPost", postJSON)
-        socket.emit("reloadPosts")
+        //socket.emit("reloadPosts")
         self.dismissViewControllerAnimated(true, completion: {})
     }
     

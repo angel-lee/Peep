@@ -53,7 +53,7 @@ var postSchema = mongoose.Schema({
 
 var PostModel = mongoose.model('Post', postSchema);
 
-function createPost(post) {
+function createPost(socket, post) {
 	var newPost = new PostModel({userId: post.userId, content: post.content, hashtags: post.hashtags});
 
 		newPost.save(function(err) {
@@ -63,11 +63,12 @@ function createPost(post) {
 			else {
 				console.log(newPost + ' saved to db!');
 				//socket.emit('postSaved', newPost);
+				loadPosts(socket);
 			}
 		});
 }
 
-function loadPosts(socket, post) {
+function loadPosts(socket) {
 	var query = PostModel.find({});
 
 	query.sort('-timeCreated').limit(100).exec(function(err, docs) {
@@ -267,7 +268,7 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('createPost', function(pst) {
-		createPost(pst);
+		createPost(socket, pst);
 	});
 
 	socket.on('createComment', function(post) {
