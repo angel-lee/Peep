@@ -44,7 +44,6 @@ var postSchema = mongoose.Schema({
 			content: String,
 			likes: {type: Number, default: 0},
 			likers: [String],
-			hashtags: [String],
 			timeCreated: {type: Date, default: Date.now}
 		}
 	],
