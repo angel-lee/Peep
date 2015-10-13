@@ -51,11 +51,37 @@ class PostViewController: UIViewController {
     @IBAction func post(button: UIBarButtonItem) {
         let postJSON = [
             "userId": deviceId,
-            "content": textView.text
+            "content": textView.text,
+            "hashtags": findHashtags()
         ]
         socket.emit("createPost", postJSON)
         socket.emit("reloadPosts")
         self.dismissViewControllerAnimated(true, completion: {})
+    }
+    
+    func findHashtags() -> NSMutableArray {
+        var hashtagArray: NSMutableArray! = []
+        var regex: NSRegularExpression = NSRegularExpression()
+        
+        let contentString: String = (textView.text)!
+        
+        let string: NSString = contentString as NSString
+        
+        do {
+            regex = try NSRegularExpression(pattern: "#(\\w+)", options: NSRegularExpressionOptions.CaseInsensitive)
+        }
+        catch {}
+        
+        let matches: NSArray = regex.matchesInString(contentString, options: NSMatchingOptions.ReportCompletion, range: NSMakeRange(0, contentString.characters.count))
+        
+        for match: NSTextCheckingResult in matches as! [NSTextCheckingResult] {
+            let wordRange: NSRange = match.rangeAtIndex(0)
+            
+            let stringToSave: String = string.substringWithRange(wordRange)
+            
+            hashtagArray.addObject(stringToSave)
+        }
+        return hashtagArray
     }
     
     /*

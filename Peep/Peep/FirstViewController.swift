@@ -80,73 +80,11 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
             //destinationViewController.comments = posts[indexPath.row].valueForKey("comments") as! NSArray
             destinationViewController.postId = posts[indexPath.row].valueForKey("_id") as! String
             destinationViewController.originalPosterId = posts[indexPath.row].valueForKey("userId") as! String
+            destinationViewController.postLikes = posts[indexPath.row].valueForKey("likes") as! Int
+            //destinationViewController.postLikers = posts[indexPath.row].valueForKey("likers") as! NSArray
             
             //destinationViewController.hidesBottomBarWhenPushed = true
         }
-    }
-    
-    /*override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if(segue.identifier == "newPost") {
-            let nav = segue.destinationViewController as! UINavigationController
-            let postViewController = nav.topViewController as! PostViewController
-            
-            postViewController.toReceive = self.socket
-            postViewController.deviceIdToRecieve = self.deviceId
-        }
-    }*/
-    
-    
-//    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-//        var cell:PostCellTableViewCell = self.tableView.dequeueReusableCellWithIdentifier("postContentCell") as! UITableViewCell
-//        
-//        //cell.textLabel?.text = self.posts[indexPath.row].valueForKey("content") as? String
-//        cell.postContent?.text = self.posts[indexPath.row] as? String
-//
-//        
-//        return cell
-//    }
-    
-//    func findHashtags(cell: PostCellTableViewCell, atIndexPath indexPath: NSIndexPath) {
-//        var stringToSearch: String = cell.postContent.text!
-//        
-//        let secondAttributes = [NSForegroundColorAttributeName: UIColor.redColor(), NSBackgroundColorAttributeName: UIColor.blueColor(), NSUnderlineStyleAttributeName: 1]
-//        
-//        let mutableString = NSMutableAttributedString(string: stringToSearch)
-//        
-//        if let match = stringToSearch.rangeOfString(self.hashtagRegex, options: .RegularExpressionSearch) {
-//            println("hashtag " + match.description)
-//            
-//            mutableString.addAttributes(secondAttributes, range: stringToSearch.rangeOfString("Hey"))
-//            
-//        }
-//        
-//        
-//        
-//    }
-    
-    func hashtagTapped() {
-        print("tapped hashtag")
-    }
-    
-    func findHashtags(cell: PostCellTableViewCell, atIndexPath indexPath: NSIndexPath) {
-        let string = NSMutableAttributedString(string: cell.postContent.text!)
-        let words: NSArray = cell.postContent.text!.componentsSeparatedByString(" ")
-        
-        let nsstring: NSString = NSString(string: cell.postContent.text!)
-        
-        for word: NSString in words as! [NSString] {
-            //print(word)
-            if (word.hasPrefix("#")) {
-                let range: NSRange = nsstring.rangeOfString(word as String)
-                //let range: NSRange = nsstring.rangeOfString(hashtagRegex, options: .RegularExpressionSearch)
-                //print(range)
-            
-                string.addAttribute(NSForegroundColorAttributeName, value: UIColor.redColor(), range: range)
-                //string.addAttribute(NSLinkAttributeName, value: "hashtagTapped:", range: range)
-            }
-        }
-        
-        cell.postContent?.attributedText = string
     }
     
     func likePost(sender:UIButton) {
@@ -191,6 +129,55 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
     }
     
+    func removeLikeButtonForMyPosts(cell: PostCellTableViewCell, item: AnyObject) {
+        let postId: String = item.valueForKey("userId") as! String
+        
+        if(postId == app.deviceId) {
+            cell.likeButton.enabled = false
+            cell.likeButton.hidden = true
+        }
+        else {
+            cell.likeButton.enabled = true
+            cell.likeButton.hidden = false
+        }
+    }
+    
+    func setupGestureRecognizerForContentLabel(cell: PostCellTableViewCell) {
+        let gesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "labelTapped:")
+        
+        cell.postContent.userInteractionEnabled = true
+        cell.postContent.addGestureRecognizer(gesture)
+    }
+    
+    func labelTapped(sender: AnyObject) {
+        print("tapped label")
+        
+    }
+    
+    func findHashtags(cell: PostCellTableViewCell, item: AnyObject) {
+        var regex: NSRegularExpression = NSRegularExpression()
+                
+        let cellContentString: String = (cell.postContent?.text)!
+        
+        let string = NSMutableAttributedString(string: cell.postContent.text!)
+        
+        do {
+            regex = try NSRegularExpression(pattern: "#(\\w+)", options: NSRegularExpressionOptions.CaseInsensitive)
+        }
+        catch {}
+        
+        let matches: NSArray = regex.matchesInString(cellContentString, options: NSMatchingOptions.ReportCompletion, range: NSMakeRange(0, cellContentString.characters.count))
+        
+        for match: NSTextCheckingResult in matches as! [NSTextCheckingResult] {
+            let wordRange: NSRange = match.rangeAtIndex(0)
+                            
+            string.addAttribute(NSForegroundColorAttributeName, value: UIColor.blueColor(), range: wordRange)
+            string.addAttribute(NSLinkAttributeName, value: "#", range: wordRange)
+        }
+        
+        cell.postContent?.attributedText = string
+    }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.posts.count
     }
@@ -204,8 +191,6 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         self.configureBasicCell(cell, atIndexPath: indexPath)
         
-        findHashtags(cell, atIndexPath: indexPath)
-        
         cell.likeButton.addTarget(self, action: "likePost:", forControlEvents: UIControlEvents.TouchUpInside)
         
         return cell
@@ -216,6 +201,9 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let item: AnyObject = self.posts[indexPath.row]
         self.setPostContentForCell(cell, item: item)
         self.checkIfIveLikedPost(cell, item: item)
+        self.removeLikeButtonForMyPosts(cell, item: item)
+        self.findHashtags(cell, item: item)
+        self.setupGestureRecognizerForContentLabel(cell)
     }
     
     func setPostContentForCell(cell: PostCellTableViewCell, item: AnyObject) {

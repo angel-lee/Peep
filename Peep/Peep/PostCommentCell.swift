@@ -12,6 +12,10 @@ class PostCommentCell: UITableViewCell {
 
     @IBOutlet weak var postDetailContent: UILabel!
     @IBOutlet weak var postCommentsContent: UILabel!
+    @IBOutlet weak var likeButton: UIButton!
+    @IBOutlet weak var numOfLikes: UILabel!
+    
+    var likesInt: Int!
     
     override func awakeFromNib() {
         super.awakeFromNib()

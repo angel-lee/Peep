@@ -44,6 +44,7 @@ var postSchema = mongoose.Schema({
 			content: String,
 			likes: {type: Number, default: 0},
 			likers: [String],
+			hashtags: [String],
 			timeCreated: {type: Date, default: Date.now}
 		}
 	],
@@ -54,7 +55,7 @@ var postSchema = mongoose.Schema({
 var PostModel = mongoose.model('Post', postSchema);
 
 function createPost(post) {
-	var newPost = new PostModel({userId: post.userId, content: post.content});
+	var newPost = new PostModel({userId: post.userId, content: post.content, hashtags: post.hashtags});
 
 		newPost.save(function(err) {
 			if(err) {
@@ -127,7 +128,7 @@ function unlikePost(thePost) {
 
 		if(post.likers.indexOf(thePost.userId) != -1) {
 			post.likes--;
-			post.likers.pop(thePost.postId);
+			post.likers.pop(thePost.userId);
 			post.save(function(err) {
 				if (err) {
 				return handleError(err);
@@ -157,6 +158,7 @@ function createComment(socket, theComment) {
 			if(err) {
 				return handleError(err);
 			}
+			console.log(post.comments);
 			console.log('comment saved to post ' + '[' + post.content + ']');
 			socket.emit('commentSaved', post.comments);
 		});
@@ -187,11 +189,71 @@ function loadMyComments(socket, commentId) {
 }
 
 function likeComment(theComment) {
+	PostModel.findById(theComment.postId, function(err, post) {
+		if(err) {
+			throw err;
+		}
 
+		console.log(post.content);
+		var subDoc = post.comments.id(theComment.commentId);
+
+		console.log(subDoc.content);
+
+		if(subDoc.likers.indexOf(theComment.userId) == -1) {
+			subDoc.likes++;
+			subDoc.likers.push(theComment.userId);
+			post.save(function(err) {
+				if (err) {
+				return handleError(err);
+				}
+				console.log('[' + subDoc.content  + '] now has ' + subDoc.likes + ' likes');
+			});
+		}
+
+		else {
+			console.log('already liked comment');
+		}
+	});
 }
 
 function unlikeComment(theComment) {
-	
+	PostModel.findById(theComment.postId, function(err, post) {
+		if(err) {
+			throw err;
+		}
+
+		console.log(post.content);
+		var subDoc = post.comments.id(theComment.commentId);
+
+		console.log(subDoc.content);
+
+		if(subDoc.likers.indexOf(theComment.userId) != -1) {
+			subDoc.likes--;
+			subDoc.likers.pop(theComment.userId);
+			post.save(function(err) {
+				if (err) {
+				return handleError(err);
+				}
+				console.log('[' + subDoc.content  + '] now has ' + subDoc.likes + ' likes');
+			});
+		}
+
+		else {
+			console.log('already unliked comment');
+		}
+	});
+}
+
+function getThePost(socket, postId) {
+	PostModel.findById(postId, function(err, post) {
+		if (err) {
+			throw err;
+		}
+
+		console.log('getting post [' + post.content + ']');
+		socket.emit("getThePost", post);
+	});
+
 }
 
 io.on('connection', function(socket) {
@@ -234,5 +296,17 @@ io.on('connection', function(socket) {
 	});
 	socket.on('unlikePost', function(pstId) {
 		unlikePost(pstId);
+	});
+
+	socket.on('likeComment', function(cmtId) {
+		likeComment(cmtId);
+	});
+
+	socket.on('unlikeComment', function(cmtId) {
+		unlikeComment(cmtId);
+	});
+
+	socket.on('getThePost', function(pstId) {
+		getThePost(socket, pstId);
 	});
 });
