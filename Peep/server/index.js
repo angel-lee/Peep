@@ -256,6 +256,18 @@ function getThePost(socket, postId) {
 
 }
 
+function loadPostsWithHashtag(socket, hashtag) {
+	var query = PostModel.find({hashtags: hashtag});
+
+	query.sort('-timeCreated').exec(function(err, posts) {
+		if(err) {
+			throw err;
+		}
+		console.log('getting posts with hashtag [' + hashtag + ']');
+		socket.emit('loadPostsWithHashtag', posts);
+	});
+}
+
 io.on('connection', function(socket) {
 	numConnectedClients++;
 	console.log(numConnectedClients + ' clients connected');
@@ -308,5 +320,9 @@ io.on('connection', function(socket) {
 
 	socket.on('getThePost', function(pstId) {
 		getThePost(socket, pstId);
+	});
+
+	socket.on('loadPostsWithHashtag', function(tag) {
+		loadPostsWithHashtag(socket, tag);
 	});
 });

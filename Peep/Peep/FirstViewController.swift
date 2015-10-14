@@ -8,6 +8,7 @@
 
 import UIKit
 import Socket_IO_Client_Swift
+import ActiveLabel
 
 class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -27,6 +28,8 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     let socket = SocketIOClient(socketURL: "localhost:8000")
     //let socket = SocketIOClient(socketURL: "http://ec2-52-89-43-120.us-west-2.compute.amazonaws.com:8080")
     
+    var hashtagToSend: String!
+    
     func socketHandlers() {
         socket.on("connect") {data, ack in
             print("connected to ec2:8080")
@@ -42,7 +45,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        
+                
         app.socket = self.socket
         
         self.deviceId = UIDevice.currentDevice().identifierForVendor!.UUIDString
@@ -84,6 +87,11 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
             //destinationViewController.postLikers = posts[indexPath.row].valueForKey("likers") as! NSArray
             
             //destinationViewController.hidesBottomBarWhenPushed = true
+        }
+        else if(segue.identifier == "loadHashtags") {
+            let destinationViewController: MyPostsAndCommentsViewController = segue.destinationViewController as! MyPostsAndCommentsViewController
+            destinationViewController.serverRequest = "loadPostsWithHashtag"
+            destinationViewController.hashtagToSend = self.hashtagToSend
         }
     }
     
@@ -170,10 +178,9 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         for match: NSTextCheckingResult in matches as! [NSTextCheckingResult] {
             let wordRange: NSRange = match.rangeAtIndex(0)
-                            
+            
             string.addAttribute(NSForegroundColorAttributeName, value: UIColor.blueColor(), range: wordRange)
-            string.addAttribute(NSLinkAttributeName, value: "#", range: wordRange)
-        }
+    }
         
         cell.postContent?.attributedText = string
     }
@@ -202,8 +209,13 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         self.setPostContentForCell(cell, item: item)
         self.checkIfIveLikedPost(cell, item: item)
         self.removeLikeButtonForMyPosts(cell, item: item)
-        self.findHashtags(cell, item: item)
-        self.setupGestureRecognizerForContentLabel(cell)
+        //self.findHashtags(cell, item: item)
+        //self.setupGestureRecognizerForContentLabel(cell)
+        cell.postContent.handleHashtagTap {
+            self.hashtagToSend = $0
+            //print(self.hashtagToSend)
+            self.performSegueWithIdentifier("loadHashtags", sender: self)
+        }
     }
     
     func setPostContentForCell(cell: PostCellTableViewCell, item: AnyObject) {

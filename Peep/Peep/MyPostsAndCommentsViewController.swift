@@ -25,6 +25,8 @@ class MyPostsAndCommentsViewController: UIViewController, UITableViewDelegate, U
     var posts: NSArray! = []
     
     var serverRequest: String!
+    
+    var hashtagToSend: String!
 
     func socketHandlers() {
         socket.on("loadMyPosts") {data, ack in
@@ -34,6 +36,12 @@ class MyPostsAndCommentsViewController: UIViewController, UITableViewDelegate, U
         }
         
         socket.on("loadMyComments") {data, ack in
+            self.posts = data?[0] as? NSArray
+            
+            self.tableView.reloadData()
+        }
+        
+        socket.on("loadPostsWithHashtag") {data, ack in
             self.posts = data?[0] as? NSArray
             
             self.tableView.reloadData()
@@ -48,7 +56,13 @@ class MyPostsAndCommentsViewController: UIViewController, UITableViewDelegate, U
         
         self.socket = app.socket
         
-        self.socket.emit(serverRequest, app.deviceId)
+        if (serverRequest != "loadPostsWithHashtag") {
+            self.socket.emit(serverRequest, app.deviceId)
+        }
+            
+        else {
+           self.socket.emit(serverRequest, hashtagToSend)
+        }
         
         socketHandlers()
 
@@ -127,7 +141,7 @@ class MyPostsAndCommentsViewController: UIViewController, UITableViewDelegate, U
         let content: String = item.valueForKey("content") as! String
         let numLikes: Int = item.valueForKey("likes") as! Int
         
-        cell.myPostAndCommentContent?.text = content
+        cell.postContent?.text = content
         cell.numOfLikes?.text = String(numLikes)
     }
     

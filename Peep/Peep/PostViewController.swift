@@ -75,7 +75,7 @@ class PostViewController: UIViewController {
         let matches: NSArray = regex.matchesInString(contentString, options: NSMatchingOptions.ReportCompletion, range: NSMakeRange(0, contentString.characters.count))
         
         for match: NSTextCheckingResult in matches as! [NSTextCheckingResult] {
-            let wordRange: NSRange = match.rangeAtIndex(0)
+            let wordRange: NSRange = match.rangeAtIndex(1)
             
             let stringToSave: String = string.substringWithRange(wordRange)
             

@@ -7,14 +7,16 @@
 //
 
 import UIKit
+import ActiveLabel
 
 class PostCellTableViewCell: UITableViewCell {
     
-    @IBOutlet weak var postContent: UILabel!
     @IBOutlet weak var myPostAndCommentContent: UILabel!
     @IBOutlet weak var numOfLikes: UILabel!
     
     @IBOutlet weak var likeButton: UIButton!
+    
+    @IBOutlet weak var postContent : ActiveLabel!
     
     var likesInt: Int!
     var isLiked: Bool!
@@ -23,6 +25,8 @@ class PostCellTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        postContent.numberOfLines = 0
+        postContent.hashtagColor = UIColor(red: 85.0/255, green: 172.0/255, blue: 238.0/255, alpha: 1)
     }
 
     override func setSelected(selected: Bool, animated: Bool) {

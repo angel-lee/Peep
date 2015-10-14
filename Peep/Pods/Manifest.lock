@@ -1,10 +1,13 @@
 PODS:
+  - ActiveLabel (0.2.2)
   - Socket.IO-Client-Swift (3.0.1)
 
 DEPENDENCIES:
+  - ActiveLabel
   - Socket.IO-Client-Swift (~> 3.0.1)
 
 SPEC CHECKSUMS:
+  ActiveLabel: cecbc4ddf9f798bbacfa361960c9ccaeadb9d6e1
   Socket.IO-Client-Swift: efa4579e246fba85d7ca40a47710241bf35ee685
 
-COCOAPODS: 0.38.2
+COCOAPODS: 0.39.0

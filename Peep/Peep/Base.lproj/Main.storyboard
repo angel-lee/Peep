@@ -175,7 +175,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="600" height="81.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="751" verticalHuggingPriority="751" misplaced="YES" text="Content" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="dbz-WE-35h">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="751" verticalHuggingPriority="751" misplaced="YES" text="Content" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="dbz-WE-35h" customClass="ActiveLabel" customModule="ActiveLabel">
                                                     <rect key="frame" x="20" y="20" width="280" height="21"/>
                                                     <animations/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -215,7 +215,7 @@
                                         <connections>
                                             <outlet property="likeButton" destination="Mch-Nm-xUa" id="K7m-aG-kKQ"/>
                                             <outlet property="numOfLikes" destination="rx2-NS-KgI" id="0gs-Fr-tP1"/>
-                                            <outlet property="postContent" destination="dbz-WE-35h" id="RZ7-SJ-Y8x"/>
+                                            <outlet property="postContent" destination="dbz-WE-35h" id="yyb-Df-7uV"/>
                                             <segue destination="nRO-ed-akd" kind="show" identifier="showDetailPostAndComments" id="2VE-he-Hv3"/>
                                         </connections>
                                     </tableViewCell>
@@ -244,6 +244,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="tableView" destination="b6d-qt-ocB" id="lu8-MN-jP7"/>
+                        <segue destination="CC5-1J-Zkh" kind="show" identifier="loadHashtags" id="5dW-EF-GfD"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
@@ -446,7 +447,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="600" height="81.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" text="Content" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="Efr-AX-sMC">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" text="Content" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="Efr-AX-sMC" customClass="ActiveLabel" customModule="ActiveLabel">
                                                     <rect key="frame" x="20" y="20" width="280" height="21"/>
                                                     <animations/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -479,8 +480,8 @@
                                         <animations/>
                                         <connections>
                                             <outlet property="likeButton" destination="MyA-1h-K1O" id="wLZ-hj-36p"/>
-                                            <outlet property="myPostAndCommentContent" destination="Efr-AX-sMC" id="Tcg-ha-1rR"/>
                                             <outlet property="numOfLikes" destination="N1O-gY-elU" id="Vas-Ey-UT2"/>
+                                            <outlet property="postContent" destination="Efr-AX-sMC" id="j49-c7-PqL"/>
                                             <segue destination="nRO-ed-akd" kind="show" identifier="showDetailPostAndComments" id="SwM-AE-6G4"/>
                                         </connections>
                                     </tableViewCell>
@@ -535,7 +536,7 @@
         <image name="second" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="2VE-he-Hv3"/>
-        <segue reference="YWg-Jb-IRF"/>
+        <segue reference="5dW-EF-GfD"/>
+        <segue reference="SwM-AE-6G4"/>
     </inferredMetricsTieBreakers>
 </document>

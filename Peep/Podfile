@@ -3,7 +3,7 @@ use_frameworks!
 
 target 'Peep' do
 pod 'Socket.IO-Client-Swift', '~> 3.0.1’
-
+pod ‘ActiveLabel’
 end
 
 target 'PeepTests' do
