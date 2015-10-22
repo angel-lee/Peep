@@ -268,6 +268,33 @@ function loadPostsWithHashtag(socket, hashtag) {
 	});
 }
 
+function getAllHashtags(socket) {
+	var allHashtags = [];
+
+	var query = PostModel.find({}, {hashtags: true, _id: false});
+
+	query.exec(function(err, hashes) {
+		if (err) {
+			throw err;
+		}
+
+		for(var i = 0; i < hashes.length; i++) {
+			for(var j = 0; j < hashes[i].hashtags.length; j++) {
+				//console.log(hashes[i].hashtags[j]);
+				if (allHashtags.indexOf(hashes[i].hashtags[j]) == -1) {
+					allHashtags.push(hashes[i].hashtags[j]);
+				}
+				else {
+
+				}
+			}
+		}
+
+		console.log(allHashtags + '\n');
+		socket.emit('getAllHashtags', allHashtags);
+	});
+}
+
 io.on('connection', function(socket) {
 	numConnectedClients++;
 	console.log(numConnectedClients + ' clients connected');
@@ -324,5 +351,9 @@ io.on('connection', function(socket) {
 
 	socket.on('loadPostsWithHashtag', function(tag) {
 		loadPostsWithHashtag(socket, tag);
+	});
+
+	socket.on('getAllHashtags', function() {
+		getAllHashtags(socket);
 	});
 });

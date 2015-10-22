@@ -9,13 +9,15 @@
 import UIKit
 import Socket_IO_Client_Swift
 
-class PostViewController: UIViewController {
+class PostViewController: UIViewController, UITextViewDelegate {
 
     var app: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
 
     @IBOutlet weak var cancelPostButton: UIBarButtonItem!
     @IBOutlet weak var postButton: UIBarButtonItem!
     @IBOutlet weak var textView: UITextView!
+    
+    var maxCharacterCount: Int! = 180
     
     var socket: SocketIOClient!
     
@@ -38,6 +40,10 @@ class PostViewController: UIViewController {
         
         textView.becomeFirstResponder()
     }
+    
+    override func viewDidAppear(animated: Bool) {
+        self.textView.delegate = self
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -46,6 +52,19 @@ class PostViewController: UIViewController {
 
     @IBAction func cancelPost(button:UIBarButtonItem) {
         self.dismissViewControllerAnimated(true, completion: {})
+    }
+    
+    func textViewDidChange(textView: UITextView) {
+        var characterCount = self.maxCharacterCount - textView.text.characters.count
+        print(characterCount)
+        
+    }
+    
+    func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+        if textView.text.characters.count - range.length + text.characters.count > self.maxCharacterCount {
+            return false
+        }
+        return true
     }
     
     @IBAction func post(button: UIBarButtonItem) {
@@ -60,7 +79,7 @@ class PostViewController: UIViewController {
     }
     
     func findHashtags() -> NSMutableArray {
-        var hashtagArray: NSMutableArray! = []
+        let hashtagArray: NSMutableArray! = []
         var regex: NSRegularExpression = NSRegularExpression()
         
         let contentString: String = (textView.text)!

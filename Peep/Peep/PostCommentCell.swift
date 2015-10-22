@@ -7,19 +7,25 @@
 //
 
 import UIKit
+import ActiveLabel
 
 class PostCommentCell: UITableViewCell {
 
     @IBOutlet weak var postDetailContent: UILabel!
-    @IBOutlet weak var postCommentsContent: UILabel!
+    @IBOutlet weak var postCommentsContent: ActiveLabel!
     @IBOutlet weak var likeButton: UIButton!
     @IBOutlet weak var numOfLikes: UILabel!
+    @IBOutlet weak var timeLabel: UILabel!
     
     var likesInt: Int!
     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        
+        postCommentsContent.numberOfLines = 0
+        postCommentsContent.lineBreakMode = .ByWordWrapping
+        postCommentsContent.hashtagColor = UIColor(red: 85.0/255, green: 172.0/255, blue: 238.0/255, alpha: 1)
     }
 
     override func setSelected(selected: Bool, animated: Bool) {

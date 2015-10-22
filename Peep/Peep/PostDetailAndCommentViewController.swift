@@ -8,20 +8,24 @@
 
 import UIKit
 import Socket_IO_Client_Swift
+import ActiveLabel
 
 class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     var app: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     var socket: SocketIOClient!
-
+    
+    var hashtagToSend: String!
     
     @IBOutlet weak var commentTableView: UITableView!
-    @IBOutlet weak var detailContentLabel: UILabel!
+    @IBOutlet weak var detailContentLabel: ActiveLabel!
     @IBOutlet weak var commentTextField: UITextField!
     @IBOutlet weak var postCommentButton: UIBarButtonItem!
     
     @IBOutlet weak var likeButton: UIButton!
     @IBOutlet weak var likesLabel: UILabel!
+    
+    @IBOutlet weak var toolbar: UIToolbar!
     
     var detailContent: String!
     
@@ -42,6 +46,13 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
     var thePost: AnyObject!
     
     var postLikers: NSArray! = []
+    
+    var buttonString: String!
+    
+    var isLiked: Bool!
+
+    
+    //var indexPath: NSIndexPath!
 
     func socketHandlers() {
         socket.on("loadComments") {data, ack in
@@ -58,7 +69,7 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         }
         
         socket.on("getThePost") {data, ack in
-            self.thePost = data?[0]
+            //self.thePost = data?[0]
             //print(self.thePost.valueForKey("content"))
         }
     }
@@ -71,6 +82,9 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         //print(postLikes)
         
         //setContentForOriginalPost()
+                
+        detailContentLabel.numberOfLines = 0
+        detailContentLabel.hashtagColor = UIColor(red: 85.0/255, green: 172.0/255, blue: 238.0/255, alpha: 1)
         
         likeButton.addTarget(self, action: "likePost:", forControlEvents: UIControlEvents.TouchUpInside)
         
@@ -89,24 +103,27 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         postCommentButton.target = self
         postCommentButton.action = "postComment:"
         
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: "refresh:", forControlEvents: .ValueChanged)
-        commentTableView.addSubview(refreshControl)
+//        let refreshControl = UIRefreshControl()
+//        refreshControl.addTarget(self, action: "refresh:", forControlEvents: .ValueChanged)
+//        commentTableView.addSubview(refreshControl)
         
         //checkIfLikedOriginalPost()
         //setContentForOriginalPost()
         
-        findHashtags()
+        //findHashtags()
         removeLikeButtonForMyPosts()
+        setLikeButtonStateOnLoad()
         
-        //print(thePost)
+        //print(numLikes)
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
+    
+    
+    
     /*
     // MARK: - Navigation
 
@@ -117,41 +134,50 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
     }
     */
     
+    func setLikeButtonStateOnLoad() {
+        if self.isLiked == true {
+            self.likeButton.setImage(UIImage(named: "like_filled.png"), forState: UIControlState.Normal)
+        }
+        else {
+            self.likeButton.setImage(UIImage(named: "like.png"), forState: UIControlState.Normal)
+        }
+    }
+    
     func removeLikeButtonForMyPosts() {
         if(originalPosterId == app.deviceId) {
             likeButton.enabled = false
-            likeButton.hidden = true
+            //likeButton.hidden = true
         }
         else {
             likeButton.enabled = true
-            likeButton.hidden = false
+            //likeButton.hidden = false
         }
     }
 
-    func findHashtags() {
-        var regex: NSRegularExpression = NSRegularExpression()
-        
-        
-        let contentString: String = detailContentLabel.text!
-        
-        let string = NSMutableAttributedString(string: detailContentLabel.text!)
-        
-        do {
-            regex = try NSRegularExpression(pattern: "#(\\w+)", options: NSRegularExpressionOptions.CaseInsensitive)
-        }
-        catch {}
-        
-        let matches: NSArray = regex.matchesInString(contentString, options: NSMatchingOptions.ReportCompletion, range: NSMakeRange(0, contentString.characters.count))
-        
-        for match: NSTextCheckingResult in matches as! [NSTextCheckingResult] {
-            let wordRange: NSRange = match.rangeAtIndex(0)
-            
-            string.addAttribute(NSForegroundColorAttributeName, value: UIColor.blueColor(), range: wordRange)
-            //string.addAttribute(NSLinkAttributeName, value: "http://www.google.com", range: wordRange)
-        }
-        
-        detailContentLabel.attributedText = string
-    }
+//    func findHashtags() {
+//        var regex: NSRegularExpression = NSRegularExpression()
+//        
+//        
+//        let contentString: String = detailContentLabel.text!
+//        
+//        let string = NSMutableAttributedString(string: detailContentLabel.text!)
+//        
+//        do {
+//            regex = try NSRegularExpression(pattern: "#(\\w+)", options: NSRegularExpressionOptions.CaseInsensitive)
+//        }
+//        catch {}
+//        
+//        let matches: NSArray = regex.matchesInString(contentString, options: NSMatchingOptions.ReportCompletion, range: NSMakeRange(0, contentString.characters.count))
+//        
+//        for match: NSTextCheckingResult in matches as! [NSTextCheckingResult] {
+//            let wordRange: NSRange = match.rangeAtIndex(0)
+//            
+//            string.addAttribute(NSForegroundColorAttributeName, value: UIColor.blueColor(), range: wordRange)
+//            //string.addAttribute(NSLinkAttributeName, value: "http://www.google.com", range: wordRange)
+//        }
+//        
+//        detailContentLabel.attributedText = string
+//    }
     
     func setContentForOriginalPost() {
         //print(self.thePost)
@@ -168,8 +194,9 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
             "userId": app.deviceId
         ]
         
-        if (sender.titleLabel?.text == "like") {
-            sender.setTitle("unlike", forState: UIControlState.Normal)
+        if (sender.imageView?.image == UIImage(named: "like.png")) {
+            //sender.setTitle("unlike", forState: UIControlState.Normal)
+            sender.setImage(UIImage(named: "like_filled.png"), forState: UIControlState.Normal)
             
             socket.emit("likePost", postAndUserId)
             
@@ -177,14 +204,17 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
             likesLabel?.text = String(postLikes)
         }
             
-        else if (sender.titleLabel?.text == "unlike") {
-            sender.setTitle("like", forState: UIControlState.Normal)
+        else if (sender.imageView?.image == UIImage(named: "like_filled.png")) {
+            //sender.setTitle("like", forState: UIControlState.Normal)
+            sender.setImage(UIImage(named: "like.png"), forState: UIControlState.Normal)
+            
             
             socket.emit("unlikePost", postAndUserId)
             
             postLikes? -= 1
             likesLabel?.text = String(postLikes)
         }
+        
     }
     
     func likeComment(sender:UIButton) {
@@ -202,8 +232,8 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
             "userId": app.deviceId
         ]
         
-        if (sender.titleLabel?.text == "like") {
-            sender.setTitle("unlike", forState: UIControlState.Normal)
+        if (sender.imageView?.image == UIImage(named: "like.png")) {
+            sender.setImage(UIImage(named: "like_filled.png"), forState: UIControlState.Normal)
             
             socket.emit("likeComment", postIdAndUserId)
             
@@ -211,8 +241,8 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
             cell.numOfLikes?.text = String(cell.likesInt)
         }
             
-        else if (sender.titleLabel?.text == "unlike") {
-            sender.setTitle("like", forState: UIControlState.Normal)
+        else if (sender.imageView?.image == UIImage(named: "like_filled.png")) {
+            sender.setImage(UIImage(named: "like.png"), forState: UIControlState.Normal)
             
             socket.emit("unlikeComment", postIdAndUserId)
             
@@ -248,11 +278,11 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         
         if(commenterId == app.deviceId) {
             cell.likeButton.enabled = false
-            cell.likeButton.hidden = true
+            //cell.likeButton.hidden = true
         }
         else {
             cell.likeButton.enabled = true
-            cell.likeButton.hidden = false
+            //cell.likeButton.hidden = false
         }
         
     }
@@ -261,36 +291,36 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         let likersPerComment: NSArray = item.valueForKey("likers") as! NSArray
         
         if (likersPerComment.containsObject(app.deviceId)) {
-            cell.likeButton.setTitle("unlike", forState: UIControlState.Normal)
+            cell.likeButton.setImage(UIImage(named: "like_filled.png"), forState: UIControlState.Normal)
         }
         else {
-            cell.likeButton.setTitle("like", forState: UIControlState.Normal)
+            cell.likeButton.setImage(UIImage(named: "like.png"), forState: UIControlState.Normal)
         }
     }
     
-    func findHashtags(cell: PostCommentCell, item: AnyObject) {
-        var regex: NSRegularExpression = NSRegularExpression()
-                
-        let cellContentString: String = (cell.postCommentsContent?.text)!
-        
-        let string = NSMutableAttributedString(string: cell.postCommentsContent.text!)
-        
-        do {
-            regex = try NSRegularExpression(pattern: "#(\\w+)", options: NSRegularExpressionOptions.CaseInsensitive)
-        }
-        catch {}
-        
-        let matches: NSArray = regex.matchesInString(cellContentString, options: NSMatchingOptions.ReportCompletion, range: NSMakeRange(0, cellContentString.characters.count))
-        
-        for match: NSTextCheckingResult in matches as! [NSTextCheckingResult] {
-            let wordRange: NSRange = match.rangeAtIndex(0)
-            
-            string.addAttribute(NSForegroundColorAttributeName, value: UIColor.blueColor(), range: wordRange)
-            //string.addAttribute(NSLinkAttributeName, value: "http://www.google.com", range: wordRange)
-        }
-        
-        cell.postCommentsContent?.attributedText = string
-    }
+//    func findHashtags(cell: PostCommentCell, item: AnyObject) {
+//        var regex: NSRegularExpression = NSRegularExpression()
+//                
+//        let cellContentString: String = (cell.postCommentsContent?.text)!
+//        
+//        let string = NSMutableAttributedString(string: cell.postCommentsContent.text!)
+//        
+//        do {
+//            regex = try NSRegularExpression(pattern: "#(\\w+)", options: NSRegularExpressionOptions.CaseInsensitive)
+//        }
+//        catch {}
+//        
+//        let matches: NSArray = regex.matchesInString(cellContentString, options: NSMatchingOptions.ReportCompletion, range: NSMakeRange(0, cellContentString.characters.count))
+//        
+//        for match: NSTextCheckingResult in matches as! [NSTextCheckingResult] {
+//            let wordRange: NSRange = match.rangeAtIndex(0)
+//            
+//            string.addAttribute(NSForegroundColorAttributeName, value: UIColor.blueColor(), range: wordRange)
+//            //string.addAttribute(NSLinkAttributeName, value: "http://www.google.com", range: wordRange)
+//        }
+//        
+//        cell.postCommentsContent?.attributedText = string
+//    }
     
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -319,7 +349,7 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         self.setPostContentForCell(cell, item: comment)
         self.checkIfMyComment(cell, item: comment)
         self.checkIfIveLikedComment(cell, item: comment)
-        self.findHashtags(cell, item: comment)
+        //self.findHashtags(cell, item: comment)
     }
     
     func setPostContentForCell(cell: PostCommentCell, item: AnyObject) {

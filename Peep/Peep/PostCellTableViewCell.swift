@@ -18,6 +18,10 @@ class PostCellTableViewCell: UITableViewCell {
     
     @IBOutlet weak var postContent : ActiveLabel!
     
+    @IBOutlet weak var timeLabel: UILabel!
+    
+    @IBOutlet weak var numOfComments: UILabel!
+    
     var likesInt: Int!
     var isLiked: Bool!
     var likers: NSArray!
@@ -26,6 +30,7 @@ class PostCellTableViewCell: UITableViewCell {
         super.awakeFromNib()
         // Initialization code
         postContent.numberOfLines = 0
+        postContent.lineBreakMode = .ByWordWrapping
         postContent.hashtagColor = UIColor(red: 85.0/255, green: 172.0/255, blue: 238.0/255, alpha: 1)
     }
 

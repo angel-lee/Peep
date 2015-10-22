@@ -19,6 +19,10 @@ class MyProfileTableViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
+    
+    override func viewDidAppear(animated: Bool) {
+        self.tabBarController?.tabBar.hidden = false
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -27,12 +31,16 @@ class MyProfileTableViewController: UITableViewController {
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         let destinationViewController: MyPostsAndCommentsViewController = segue.destinationViewController as! MyPostsAndCommentsViewController
+        self.tabBarController?.tabBar.hidden = true
+
         if(segue.identifier == "showMyPosts") {
             //let indexPath: NSIndexPath = self.tableView.indexPathForSelectedRow!
             destinationViewController.serverRequest = "loadMyPosts"
+            destinationViewController.navigationTitle = "My Posts"
         }
         else if(segue.identifier == "showMyComments") {
             destinationViewController.serverRequest = "loadMyComments"
+            destinationViewController.navigationTitle = "My Comments"
         }
     }
 
