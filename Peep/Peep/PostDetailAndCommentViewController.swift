@@ -10,7 +10,7 @@ import UIKit
 import Socket_IO_Client_Swift
 import ActiveLabel
 
-class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate {
 
     var app: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     var socket: SocketIOClient!
@@ -31,8 +31,6 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
     
     var comments: NSArray! = []
     
-    //var testArray: NSArray! = ["comment1", "comment2"]
-    
     let cellIdentifier: String = "commentContentCell"
 
     var deviceId: String!
@@ -50,9 +48,8 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
     var buttonString: String!
     
     var isLiked: Bool!
-
     
-    //var indexPath: NSIndexPath!
+    var commentTextView: UITextView!
 
     func socketHandlers() {
         socket.on("loadComments") {data, ack in
@@ -69,20 +66,14 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         }
         
         socket.on("getThePost") {data, ack in
-            //self.thePost = data?[0]
-            //print(self.thePost.valueForKey("content"))
+
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        //print(postLikes)
         
-        //print(postLikes)
-        
-        //setContentForOriginalPost()
-                
         detailContentLabel.numberOfLines = 0
         detailContentLabel.hashtagColor = UIColor(red: 85.0/255, green: 172.0/255, blue: 238.0/255, alpha: 1)
         
@@ -100,21 +91,11 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         detailContentLabel.text = detailContent
         likesLabel.text = String(postLikes)
         
-        postCommentButton.target = self
-        postCommentButton.action = "postComment:"
-        
-//        let refreshControl = UIRefreshControl()
-//        refreshControl.addTarget(self, action: "refresh:", forControlEvents: .ValueChanged)
-//        commentTableView.addSubview(refreshControl)
-        
-        //checkIfLikedOriginalPost()
-        //setContentForOriginalPost()
-        
-        //findHashtags()
         removeLikeButtonForMyPosts()
         setLikeButtonStateOnLoad()
         
-        //print(numLikes)
+        //self.commentTableView.keyboardDismissMode = .OnDrag
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -122,7 +103,33 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         // Dispose of any resources that can be recreated.
     }
     
+    override func viewWillAppear(animated: Bool) {
+        commentTextView = UITextView(frame: CGRectMake(0,0,self.view.frame.width - (self.view.frame.width/5),32))
+        commentTextView.delegate = self
+        commentTextView.font = UIFont(name: "Helvetica Neue", size: 15)
+        commentTextView.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
+        commentTextView.layer.borderWidth = 1
+        commentTextView.layer.borderColor = UIColor.grayColor().CGColor
+        commentTextView.layer.cornerRadius = 5
+        
+        let commentTextFieldItem: UIBarButtonItem = UIBarButtonItem.init(customView: commentTextView)
+        let flexItem: UIBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: self, action: nil)
+        let commentButton: UIBarButtonItem = UIBarButtonItem(title: "Post", style: UIBarButtonItemStyle.Plain, target: self, action: "postComment:")
+        let barItems: [UIBarButtonItem] = NSArray(objects: commentTextFieldItem, flexItem, commentButton) as! [UIBarButtonItem]
+        
+        toolbar.setItems(barItems, animated: true)
+    }
     
+     func textViewShouldBeginEditing(textView: UITextView) -> Bool {
+        print("hey")
+        self.commentTableView.frame = CGRectMake(self.commentTableView.frame.origin.x, self.commentTableView.frame.origin.y, self.commentTableView.frame.size.width, self.commentTableView.frame.size.height - 190)
+        return true
+    }
+    
+    func textViewDidChange(textView: UITextView) {
+        
+
+    }
     
     /*
     // MARK: - Navigation
@@ -146,45 +153,10 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
     func removeLikeButtonForMyPosts() {
         if(originalPosterId == app.deviceId) {
             likeButton.enabled = false
-            //likeButton.hidden = true
         }
         else {
             likeButton.enabled = true
-            //likeButton.hidden = false
         }
-    }
-
-//    func findHashtags() {
-//        var regex: NSRegularExpression = NSRegularExpression()
-//        
-//        
-//        let contentString: String = detailContentLabel.text!
-//        
-//        let string = NSMutableAttributedString(string: detailContentLabel.text!)
-//        
-//        do {
-//            regex = try NSRegularExpression(pattern: "#(\\w+)", options: NSRegularExpressionOptions.CaseInsensitive)
-//        }
-//        catch {}
-//        
-//        let matches: NSArray = regex.matchesInString(contentString, options: NSMatchingOptions.ReportCompletion, range: NSMakeRange(0, contentString.characters.count))
-//        
-//        for match: NSTextCheckingResult in matches as! [NSTextCheckingResult] {
-//            let wordRange: NSRange = match.rangeAtIndex(0)
-//            
-//            string.addAttribute(NSForegroundColorAttributeName, value: UIColor.blueColor(), range: wordRange)
-//            //string.addAttribute(NSLinkAttributeName, value: "http://www.google.com", range: wordRange)
-//        }
-//        
-//        detailContentLabel.attributedText = string
-//    }
-    
-    func setContentForOriginalPost() {
-        //print(self.thePost)
-    }
-    
-    func checkIfLikedOriginalPost() {
-        //print(thePost)
     }
     
     func likePost(sender: UIButton) {
@@ -195,7 +167,6 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         ]
         
         if (sender.imageView?.image == UIImage(named: "like.png")) {
-            //sender.setTitle("unlike", forState: UIControlState.Normal)
             sender.setImage(UIImage(named: "like_filled.png"), forState: UIControlState.Normal)
             
             socket.emit("likePost", postAndUserId)
@@ -205,9 +176,7 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         }
             
         else if (sender.imageView?.image == UIImage(named: "like_filled.png")) {
-            //sender.setTitle("like", forState: UIControlState.Normal)
             sender.setImage(UIImage(named: "like.png"), forState: UIControlState.Normal)
-            
             
             socket.emit("unlikePost", postAndUserId)
             
@@ -252,16 +221,25 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
     }
     
     @IBAction func postComment(button: UIBarButtonItem) {
-
+        
         let commentJSON = [
             "postId": postId,
             "userId": deviceId,
-            "content": commentTextField.text,
+            "content": commentTextView.text,
         ]
         
-        socket.emit("createComment", commentJSON)
-        commentTextField.text = ""
-        //socket.emit("loadComments", self.postId)
+        let rawString: NSString = commentTextView.text
+        let whitespace: NSCharacterSet = NSCharacterSet.whitespaceAndNewlineCharacterSet()
+        let trimmed: NSString = rawString.stringByTrimmingCharactersInSet(whitespace)
+        
+        if(trimmed.length == 0) {
+            // Text was empty or only whitespace.
+
+        }
+        else {
+            socket.emit("createComment", commentJSON)
+            commentTextView.text = ""
+        }
     }
     
     func refresh(refreshControl: UIRefreshControl) {
@@ -278,11 +256,9 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         
         if(commenterId == app.deviceId) {
             cell.likeButton.enabled = false
-            //cell.likeButton.hidden = true
         }
         else {
             cell.likeButton.enabled = true
-            //cell.likeButton.hidden = false
         }
         
     }
@@ -298,35 +274,8 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         }
     }
     
-//    func findHashtags(cell: PostCommentCell, item: AnyObject) {
-//        var regex: NSRegularExpression = NSRegularExpression()
-//                
-//        let cellContentString: String = (cell.postCommentsContent?.text)!
-//        
-//        let string = NSMutableAttributedString(string: cell.postCommentsContent.text!)
-//        
-//        do {
-//            regex = try NSRegularExpression(pattern: "#(\\w+)", options: NSRegularExpressionOptions.CaseInsensitive)
-//        }
-//        catch {}
-//        
-//        let matches: NSArray = regex.matchesInString(cellContentString, options: NSMatchingOptions.ReportCompletion, range: NSMakeRange(0, cellContentString.characters.count))
-//        
-//        for match: NSTextCheckingResult in matches as! [NSTextCheckingResult] {
-//            let wordRange: NSRange = match.rangeAtIndex(0)
-//            
-//            string.addAttribute(NSForegroundColorAttributeName, value: UIColor.blueColor(), range: wordRange)
-//            //string.addAttribute(NSLinkAttributeName, value: "http://www.google.com", range: wordRange)
-//        }
-//        
-//        cell.postCommentsContent?.attributedText = string
-//    }
-    
-    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        //print(self.comments.count)
         return self.comments.count
-        //return self.testArray.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -349,7 +298,6 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         self.setPostContentForCell(cell, item: comment)
         self.checkIfMyComment(cell, item: comment)
         self.checkIfIveLikedComment(cell, item: comment)
-        //self.findHashtags(cell, item: comment)
     }
     
     func setPostContentForCell(cell: PostCommentCell, item: AnyObject) {

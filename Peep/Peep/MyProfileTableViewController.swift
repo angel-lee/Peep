@@ -31,10 +31,10 @@ class MyProfileTableViewController: UITableViewController {
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         let destinationViewController: MyPostsAndCommentsViewController = segue.destinationViewController as! MyPostsAndCommentsViewController
+        
         self.tabBarController?.tabBar.hidden = true
 
         if(segue.identifier == "showMyPosts") {
-            //let indexPath: NSIndexPath = self.tableView.indexPathForSelectedRow!
             destinationViewController.serverRequest = "loadMyPosts"
             destinationViewController.navigationTitle = "My Posts"
         }

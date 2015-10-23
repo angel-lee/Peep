@@ -51,14 +51,12 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
 
         self.resultSearchController = ({
             let controller = UISearchController(searchResultsController: nil)
-            //controller.definesPresentationContext = true
             controller.searchResultsUpdater = self
             controller.hidesNavigationBarDuringPresentation = false;
             controller.dimsBackgroundDuringPresentation = false
             controller.searchBar.sizeToFit()
             controller.searchBar.placeholder = "Search Tags"
             
-            //self.tableView.tableHeaderView = controller.searchBar
             self.navigationItem.titleView = controller.searchBar
             
             return controller
@@ -124,8 +122,7 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
         }
     }
     
-    func updateSearchResultsForSearchController(searchController: UISearchController)
-    {
+    func updateSearchResultsForSearchController(searchController: UISearchController) {
         searchResults.removeAll(keepCapacity: false)
         
         let searchPredicate = NSPredicate(format: "SELF CONTAINS[c] %@", searchController.searchBar.text!)
@@ -144,10 +141,10 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
             self.hashtagToSend = searchResults[indexPath.row]
         }
         
-        //vc1.hidesBottomBarWhenPushed = true
         vc1.serverRequest = "loadPostsWithHashtag"
         vc1.hashtagToSend = self.hashtagToSend
         vc1.navigationItem.title = "#\(hashtagToSend)"
+        
         self.resultSearchController.active = false
         self.navigationController?.pushViewController(vc1, animated: true)
     }

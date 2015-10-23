@@ -21,10 +21,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     var deviceId: String!
    
     var posts: NSArray! = []
-    
-    let hashtagRegex = "#[A-Za-z0-9]+"
-    //let hashtagRegex = "\\s*#(?:\\[[^\\]]+\\]|\\s+)"
-    
+
     let socket = SocketIOClient(socketURL: "localhost:8000")
     //let socket = SocketIOClient(socketURL: "http://ec2-52-89-43-120.us-west-2.compute.amazonaws.com:8080")
     
@@ -54,10 +51,6 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         socketHandlers()
         self.socket.connect()
         
-        //self.tableView.estimatedRowHeight = 200
-        
-        //self.tableView.registerClass(PostCellTableViewCell.self, forCellReuseIdentifier: cellIdentifier)
-        
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: "refresh:", forControlEvents: .ValueChanged)
         tableView.addSubview(refreshControl)
@@ -65,7 +58,6 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     override func viewDidAppear(animated: Bool) {
-        //self.showTabBar(self.tabBarController!)
         self.tabBarController?.tabBar.hidden = false
     }
     
@@ -82,54 +74,6 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         refreshControl.endRefreshing()
     }
     
-//    - (void)hideTabBar:(UITabBarController *) tabbarcontroller
-//    {
-//    [UIView beginAnimations:nil context:NULL];
-//    [UIView setAnimationDuration:0.5];
-//    
-//    for(UIView *view in tabbarcontroller.view.subviews)
-//    {
-//    if([view isKindOfClass:[UITabBar class]])
-//    {
-//    [view setFrame:CGRectMake(view.frame.origin.x, 480, view.frame.size.width, view.frame.size.height)];
-//    }
-//    else
-//    {
-//    [view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, 480)];
-//    }
-//    }
-//    
-//    [UIView commitAnimations];
-//    }
-    func hideTabBar(tabBarController: UITabBarController) {
-        UIView.beginAnimations("", context: nil)
-        UIView.setAnimationDuration(0.5)
-        
-        for view: UIView in tabBarController.view.subviews {
-            if (view.isKindOfClass(UITabBar)) {
-                view.hidden = true
-            }
-        }
-        
-        UIView.commitAnimations()
-    }
-    
-    func showTabBar(tabBarController: UITabBarController) {
-        UIView.beginAnimations("", context: nil)
-        UIView.setAnimationDuration(0.5)
-        
-        for view: UIView in tabBarController.view.subviews {
-            if (view.isKindOfClass(UITabBar)) {
-                view.hidden = false
-            }
-        }
-        
-        UIView.commitAnimations()
-    }
-    func sendDataToA(indexPath: NSIndexPath, likesInt: Int, likeButton: UIButton) {
-        
-    }
-    
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if(segue.identifier == "showDetailPostAndComments") {
             let indexPath: NSIndexPath = self.tableView.indexPathForSelectedRow!
@@ -137,21 +81,13 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
             
             let destinationViewController: PostDetailAndCommentViewController = segue.destinationViewController as! PostDetailAndCommentViewController
             
-            //self.hideTabBar(self.tabBarController!)
-            
             self.tabBarController?.tabBar.hidden = true
             
             destinationViewController.detailContent = posts[indexPath.row].valueForKey("content") as! String
-            //destinationViewController.comments = posts[indexPath.row].valueForKey("comments") as! NSArray
             destinationViewController.postId = posts[indexPath.row].valueForKey("_id") as! String
             destinationViewController.originalPosterId = posts[indexPath.row].valueForKey("userId") as! String
-            //destinationViewController.postLikes = posts[indexPath.row].valueForKey("likes") as! Int
             destinationViewController.postLikes = cell.likesInt
-           // destinationViewController.indexPath = indexPath
             destinationViewController.isLiked = cell.isLiked
-            
-            //destinationViewController.postLikers = posts[indexPath.row].valueForKey("likers") as! NSArray
-                        
         }
         else if(segue.identifier == "loadHashtags") {
             let destinationViewController: MyPostsAndCommentsViewController = segue.destinationViewController as! MyPostsAndCommentsViewController
@@ -175,7 +111,6 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         ]
         
         if (sender.imageView?.image == UIImage(named: "like.png")) {
-            //sender.setTitle("unlike", forState: UIControlState.Normal)
             sender.setImage(UIImage(named: "like_filled.png"), forState: UIControlState.Normal)
             
             socket.emit("likePost", postIdAndUserId)
@@ -186,9 +121,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
             
         else if (sender.imageView?.image == UIImage(named: "like_filled.png")) {
-            //sender.setTitle("like", forState: UIControlState.Normal)
             sender.setImage(UIImage(named: "like.png"), forState: UIControlState.Normal)
-
 
             socket.emit("unlikePost", postIdAndUserId)
             
@@ -202,13 +135,11 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let likersPerPost: NSArray = item.valueForKey("likers") as! NSArray
         
         if (likersPerPost.containsObject(app.deviceId)) {
-            //cell.likeButton.setTitle("unlike", forState: UIControlState.Normal)
             cell.likeButton.setImage(UIImage(named: "like_filled.png"), forState: UIControlState.Normal)
             cell.isLiked = true
 
         }
         else {
-            //cell.likeButton.setTitle("like", forState: UIControlState.Normal)
             cell.likeButton.setImage(UIImage(named: "like.png"), forState: UIControlState.Normal)
             cell.isLiked = false
 
@@ -220,11 +151,9 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         if(postId == app.deviceId) {
             cell.likeButton.enabled = false
-            //cell.likeButton.hidden = true
         }
         else {
             cell.likeButton.enabled = true
-            //cell.likeButton.hidden = false
         }
     }
     
@@ -234,34 +163,6 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         cell.postContent.userInteractionEnabled = true
         cell.postContent.addGestureRecognizer(gesture)
     }
-    
-    func labelTapped(sender: AnyObject) {
-        print("tapped label")
-        
-    }
-    
-//    func findHashtags(cell: PostCellTableViewCell, item: AnyObject) {
-//        var regex: NSRegularExpression = NSRegularExpression()
-//                
-//        let cellContentString: String = (cell.postContent?.text)!
-//        
-//        let string = NSMutableAttributedString(string: cell.postContent.text!)
-//        
-//        do {
-//            regex = try NSRegularExpression(pattern: "#(\\w+)", options: NSRegularExpressionOptions.CaseInsensitive)
-//        }
-//        catch {}
-//        
-//        let matches: NSArray = regex.matchesInString(cellContentString, options: NSMatchingOptions.ReportCompletion, range: NSMakeRange(0, cellContentString.characters.count))
-//        
-//        for match: NSTextCheckingResult in matches as! [NSTextCheckingResult] {
-//            let wordRange: NSRange = match.rangeAtIndex(0)
-//            
-//            string.addAttribute(NSForegroundColorAttributeName, value: UIColor.blueColor(), range: wordRange)
-//    }
-//        
-//        cell.postContent?.attributedText = string
-//    }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.posts.count
@@ -287,14 +188,13 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         self.setPostContentForCell(cell, item: item)
         self.checkIfIveLikedPost(cell, item: item)
         self.removeLikeButtonForMyPosts(cell, item: item)
-        //self.findHashtags(cell, item: item)
-        //self.setupGestureRecognizerForContentLabel(cell)
+        
         cell.postContent.handleHashtagTap {
             self.hashtagToSend = $0
-            //print(self.hashtagToSend)
             self.tabBarController?.tabBar.hidden = true
             self.performSegueWithIdentifier("loadHashtags", sender: self)
         }
+        
     }
     
     func setPostContentForCell(cell: PostCellTableViewCell, item: AnyObject) {
@@ -329,20 +229,10 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         //print(date!.descriptionWithLocale(NSLocale.currentLocale()))
 
     }
-//
-//    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-//        //print("You selected cell #\(indexPath.row)!")d
-//        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-//        let destinationViewController: PostDetailAndCommentViewController = storyboard.instantiateViewControllerWithIdentifier("postDetails") as! PostDetailAndCommentViewController
-//                
-//        destinationViewController.detailContent = posts[indexPath.row].valueForKey("content") as! String
-//        //destinationViewController.comments = posts[indexPath.row].valueForKey("comments") as! NSArray
-//        destinationViewController.postId = posts[indexPath.row].valueForKey("_id") as! String
-//        destinationViewController.originalPosterId = posts[indexPath.row].valueForKey("userId") as! String
-//        destinationViewController.postLikes = posts[indexPath.row].valueForKey("likes") as! Int
-//        
-//        self.navigationController?.pushViewController(destinationViewController, animated: true)
-//    }
+
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+    }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return heightForBasicCellAtIndexPath(indexPath)

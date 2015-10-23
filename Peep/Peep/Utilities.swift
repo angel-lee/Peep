@@ -52,8 +52,6 @@ class Utilities: NSObject {
             s = "S"
         }
         
-        //print(Double(timeAgo), scale)
-        //return NSString(string: "%d %@%@ ago", timeAgo, scale, s)
         return "\(timeAgo) \(scale)\(s)"
         
     }

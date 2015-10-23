@@ -55,7 +55,7 @@ class PostViewController: UIViewController, UITextViewDelegate {
     }
     
     func textViewDidChange(textView: UITextView) {
-        var characterCount = self.maxCharacterCount - textView.text.characters.count
+        let characterCount = self.maxCharacterCount - textView.text.characters.count
         print(characterCount)
         
     }
@@ -74,10 +74,10 @@ class PostViewController: UIViewController, UITextViewDelegate {
             "hashtags": findHashtags()
         ]
         socket.emit("createPost", postJSON)
-        //socket.emit("reloadPosts")
         self.dismissViewControllerAnimated(true, completion: {})
     }
     
+    // find different way to get hashtags from textView similar to ActiveLabel 
     func findHashtags() -> NSMutableArray {
         let hashtagArray: NSMutableArray! = []
         var regex: NSRegularExpression = NSRegularExpression()
