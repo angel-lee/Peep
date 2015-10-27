@@ -93,7 +93,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
             let destinationViewController: MyPostsAndCommentsViewController = segue.destinationViewController as! MyPostsAndCommentsViewController
             destinationViewController.serverRequest = "loadPostsWithHashtag"
             destinationViewController.hashtagToSend = self.hashtagToSend
-            destinationViewController.navigationTitle = "#\(hashtagToSend)"
+            destinationViewController.navigationTitle = "#\(hashtagToSend.uppercaseString)"
         }
     }
     
@@ -190,7 +190,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         self.removeLikeButtonForMyPosts(cell, item: item)
         
         cell.postContent.handleHashtagTap {
-            self.hashtagToSend = $0
+            self.hashtagToSend = $0.lowercaseString
             self.tabBarController?.tabBar.hidden = true
             self.performSegueWithIdentifier("loadHashtags", sender: self)
         }

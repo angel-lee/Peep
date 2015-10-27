@@ -315,15 +315,15 @@
                                     </constraints>
                                     <variation key="default">
                                         <mask key="constraints">
+                                            <exclude reference="CFH-Oj-VQ7"/>
+                                            <exclude reference="bXg-Pt-wzH"/>
                                             <exclude reference="heU-eZ-e0q"/>
                                             <exclude reference="yoe-U1-Oft"/>
-                                            <exclude reference="bXg-Pt-wzH"/>
-                                            <exclude reference="CFH-Oj-VQ7"/>
-                                            <exclude reference="sAu-cb-FxA"/>
-                                            <exclude reference="LoX-rC-1ix"/>
                                             <exclude reference="5uT-sC-c7C"/>
-                                            <exclude reference="kvd-E3-r8q"/>
                                             <exclude reference="Lbt-Zg-8jo"/>
+                                            <exclude reference="LoX-rC-1ix"/>
+                                            <exclude reference="kvd-E3-r8q"/>
+                                            <exclude reference="sAu-cb-FxA"/>
                                         </mask>
                                     </variation>
                                 </tableViewCellContentView>
@@ -639,7 +639,7 @@
             </objects>
             <point key="canvasLocation" x="0.0" y="0.0"/>
         </scene>
-        <!--Search View Controller-->
+        <!--Search-->
         <scene sceneID="k3f-LA-a8G">
             <objects>
                 <viewController id="Ud7-d7-XZg" customClass="SearchViewController" customModule="Peep" customModuleProvider="target" sceneMemberID="viewController">
@@ -697,7 +697,7 @@
                             <constraint firstItem="08j-zw-grK" firstAttribute="top" secondItem="SW4-Wi-QOD" secondAttribute="top" id="zNj-w7-OVK"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="7qF-R4-15T"/>
+                    <navigationItem key="navigationItem" title="Search" id="7qF-R4-15T"/>
                     <connections>
                         <outlet property="searchDisplayController" destination="J53-ol-OR7" id="m20-Dr-KtX"/>
                         <outlet property="tableView" destination="08j-zw-grK" id="pHc-Dh-wj9"/>

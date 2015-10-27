@@ -96,7 +96,8 @@ class PostViewController: UIViewController, UITextViewDelegate {
         for match: NSTextCheckingResult in matches as! [NSTextCheckingResult] {
             let wordRange: NSRange = match.rangeAtIndex(1)
             
-            let stringToSave: String = string.substringWithRange(wordRange)
+            var stringToSave: String = string.substringWithRange(wordRange)
+            stringToSave = stringToSave.lowercaseString
             
             hashtagArray.addObject(stringToSave)
         }

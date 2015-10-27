@@ -226,15 +226,21 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
         self.removeLikeButtonForMyPosts(cell, item: item)
         
         cell.postContent.handleHashtagTap {
-            let hashtagToSend = $0
+            let hashtag: String = "#\($0.uppercaseString)"
+            if hashtag == self.navigationTitle {
+                print("cant segue")
+            }
+            else {
+                let hashtagToSend = $0.lowercaseString
             
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let destinationViewController: MyPostsAndCommentsViewController = storyboard.instantiateViewControllerWithIdentifier("alotofviews") as! MyPostsAndCommentsViewController
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let destinationViewController: MyPostsAndCommentsViewController = storyboard.instantiateViewControllerWithIdentifier("alotofviews") as! MyPostsAndCommentsViewController
             
-            destinationViewController.serverRequest = "loadPostsWithHashtag"
-            destinationViewController.hashtagToSend = hashtagToSend
-            destinationViewController.navigationTitle = "#\(hashtagToSend)"
-            self.navigationController?.pushViewController(destinationViewController, animated: true)
+                destinationViewController.serverRequest = "loadPostsWithHashtag"
+                destinationViewController.hashtagToSend = hashtagToSend
+                destinationViewController.navigationTitle = "#\(hashtagToSend.uppercaseString)"
+                self.navigationController?.pushViewController(destinationViewController, animated: true)
+            }
         }
     }
     

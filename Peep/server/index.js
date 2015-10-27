@@ -268,31 +268,34 @@ function loadPostsWithHashtag(socket, hashtag) {
 	});
 }
 
-function getAllHashtags(socket) {
+function filterForHashtags(socket, filter) {
 	var allHashtags = [];
 
-	var query = PostModel.find({}, {hashtags: true, _id: false});
+	var query = PostModel.find({hashtags: {$regex: '^' + filter}});
 
-	query.exec(function(err, hashes) {
-		if (err) {
-			throw err;
-		}
+	if (filter != "") {
+		query.exec(function(err, posts) {
+			if (err) {
+				throw err;
+			}
 
-		for(var i = 0; i < hashes.length; i++) {
-			for(var j = 0; j < hashes[i].hashtags.length; j++) {
-				//console.log(hashes[i].hashtags[j]);
-				if (allHashtags.indexOf(hashes[i].hashtags[j]) == -1) {
-					allHashtags.push(hashes[i].hashtags[j]);
-				}
-				else {
-
+			for(var i = 0; i < posts.length; i++) {
+				for (var j = 0; j < posts[i].hashtags.length; j++) {
+					if (posts[i].hashtags[j].indexOf(filter) != -1) {
+						if (allHashtags.indexOf(posts[i].hashtags[j]) == -1) {
+							allHashtags.push(posts[i].hashtags[j]);
+						}
+					}
 				}
 			}
-		}
-
-		console.log(allHashtags + '\n');
-		socket.emit('getAllHashtags', allHashtags);
-	});
+			console.log(allHashtags);
+			socket.emit('filterForHashtags', allHashtags);
+		});
+	}
+	else {
+		allHashtags = [];
+		socket.emit('filterForHashtags', allHashtags);
+	}
 }
 
 io.on('connection', function(socket) {
@@ -353,7 +356,7 @@ io.on('connection', function(socket) {
 		loadPostsWithHashtag(socket, tag);
 	});
 
-	socket.on('getAllHashtags', function() {
-		getAllHashtags(socket);
+	socket.on('filterForHashtags', function(filter) {
+		filterForHashtags(socket, filter);
 	});
 });

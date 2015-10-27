@@ -9,7 +9,7 @@
 import UIKit
 import Socket_IO_Client_Swift
 
-class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchResultsUpdating {
+class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchResultsUpdating, UISearchBarDelegate {
 
     var app: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     var socket: SocketIOClient!
@@ -21,7 +21,7 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
 
     var hashtagsRetrieved: NSArray! = []
     var allHashtags: NSArray! = []
-    var searchResults = [String]()
+    var searchResults: NSArray! = []
     
     var trendingHashtags: NSArray! = []
 
@@ -30,11 +30,13 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
     var hashtagToSend: String!
     
     func socketHandlers() {
-        socket.on("getAllHashtags") {data, ack in
+        socket.on("filterForHashtags") {data, ack in
             
-            self.allHashtags = data?[0] as? NSArray
+            self.searchResults = data?[0] as? NSArray
+            //print("filtering...")
+            //print(self.allHashtags)
             
-            print(self.allHashtags)
+            self.tableView.reloadData()
         }
     }
 
@@ -42,13 +44,13 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
         super.viewDidLoad()
         
         self.socket = app.socket
-        socket.emit("getAllHashtags")
+        //socket.emit("getAllHashtags")
         self.socketHandlers()
         
         self.changeTrendingLabel()
         
         resultSearchController = UISearchController()
-
+        
         self.resultSearchController = ({
             let controller = UISearchController(searchResultsController: nil)
             controller.searchResultsUpdater = self
@@ -70,12 +72,20 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
     override func viewDidAppear(animated: Bool) {
         self.tabBarController?.tabBar.hidden = false
     }
+    
+    override func viewWillDisappear(animated: Bool) {
+        print("disappear")
+        //self.resultSearchController.active = false
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        print("change")
+    }
 
     /*
     // MARK: - Navigation
@@ -111,7 +121,7 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
         let cell:UITableViewCell = self.tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath)
         
         if (self.resultSearchController.active) {
-            cell.textLabel?.text = searchResults[indexPath.row]
+            cell.textLabel?.text = "#\(searchResults[indexPath.row])"
             
             return cell
         }
@@ -123,13 +133,18 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     func updateSearchResultsForSearchController(searchController: UISearchController) {
-        searchResults.removeAll(keepCapacity: false)
+        //if (searchController.searchBar.text != "") {
+            print(searchController.searchBar.text)
+            socket.emit("filterForHashtags", (searchController.searchBar.text?.lowercaseString)!)
+        //}
+        //searchResults.removeAll(keepCapacity: false)
         
-        let searchPredicate = NSPredicate(format: "SELF CONTAINS[c] %@", searchController.searchBar.text!)
-        let array = allHashtags.filteredArrayUsingPredicate(searchPredicate)
-        searchResults = array as! [String]
+        //let searchPredicate = NSPredicate(format: "SELF CONTAINS[c] %@", searchController.searchBar.text!)
+        //print(searchPredicate)
+        //let array = allHashtags.filteredArrayUsingPredicate(searchPredicate)
+        //searchResults = allHashtags as! [String]
         
-        self.tableView.reloadData()
+        //self.tableView.reloadData()
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
@@ -138,14 +153,14 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
         let vc1: MyPostsAndCommentsViewController = storyboard.instantiateViewControllerWithIdentifier("alotofviews") as! MyPostsAndCommentsViewController
         
         if(self.resultSearchController.active) {
-            self.hashtagToSend = searchResults[indexPath.row]
+            self.hashtagToSend = searchResults[indexPath.row] as! String
         }
         
         vc1.serverRequest = "loadPostsWithHashtag"
-        vc1.hashtagToSend = self.hashtagToSend
-        vc1.navigationItem.title = "#\(hashtagToSend)"
+        vc1.hashtagToSend = self.hashtagToSend.lowercaseString
+        vc1.navigationTitle = "#\(hashtagToSend.uppercaseString)"
         
-        self.resultSearchController.active = false
+        //self.resultSearchController.active = false
         self.navigationController?.pushViewController(vc1, animated: true)
     }
     
