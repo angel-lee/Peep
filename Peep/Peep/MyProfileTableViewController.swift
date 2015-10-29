@@ -21,7 +21,7 @@ class MyProfileTableViewController: UITableViewController {
     }
     
     override func viewDidAppear(animated: Bool) {
-        self.tabBarController?.tabBar.hidden = false
+        //self.tabBarController?.tabBar.hidden = false
     }
 
     override func didReceiveMemoryWarning() {
@@ -32,7 +32,7 @@ class MyProfileTableViewController: UITableViewController {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         let destinationViewController: MyPostsAndCommentsViewController = segue.destinationViewController as! MyPostsAndCommentsViewController
         
-        self.tabBarController?.tabBar.hidden = true
+        //self.tabBarController?.tabBar.hidden = true
 
         if(segue.identifier == "showMyPosts") {
             destinationViewController.serverRequest = "loadMyPosts"

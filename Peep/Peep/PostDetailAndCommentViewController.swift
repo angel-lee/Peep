@@ -10,7 +10,7 @@ import UIKit
 import Socket_IO_Client_Swift
 import ActiveLabel
 
-class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate {
+class PostDetailAndCommentViewController: UITableViewController, UITextViewDelegate {
 
     var app: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     var socket: SocketIOClient!
@@ -25,7 +25,7 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
     @IBOutlet weak var likeButton: UIButton!
     @IBOutlet weak var likesLabel: UILabel!
     
-    @IBOutlet weak var toolbar: UIToolbar!
+    //@IBOutlet weak var toolbar: UIToolbar!
     
     var detailContent: String!
     
@@ -33,7 +33,7 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
     
     let cellIdentifier: String = "commentContentCell"
 
-    var deviceId: String!
+    var userId: NSString!
     
     var postId: String!
     
@@ -51,6 +51,10 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
     
     var commentTextView: UITextView!
 
+    var kbHeight: CGFloat!
+    
+    var toolbar: UIToolbar!
+    
     func socketHandlers() {
         socket.on("loadComments") {data, ack in
             
@@ -63,6 +67,14 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
             self.comments = data?[0] as? NSArray
             
             self.commentTableView.reloadData()
+            
+            if(self.commentTableView.numberOfRowsInSection(0) == 0) {
+                
+            }
+            else {
+                let indexPath = self.commentTableView.numberOfRowsInSection(0) - 1
+                self.commentTableView.scrollToRowAtIndexPath(NSIndexPath(forRow: indexPath, inSection: 0), atScrollPosition: UITableViewScrollPosition.Top, animated: true)
+            }
         }
         
         socket.on("getThePost") {data, ack in
@@ -79,7 +91,7 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         
         likeButton.addTarget(self, action: "likePost:", forControlEvents: UIControlEvents.TouchUpInside)
         
-        self.deviceId = app.deviceId
+        self.userId = app.userId
         self.socket = app.socket
         
         socketHandlers()
@@ -97,13 +109,53 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         //self.commentTableView.keyboardDismissMode = .OnDrag
         
     }
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
+    func animateTextField(up: Bool) {
+        let movement = (up ? -kbHeight : kbHeight)
+        
+        UIView.animateWithDuration(0.3, animations: {
+            self.navigationController!.toolbar.frame.origin.y += movement
+            self.commentTableView.frame = CGRectMake(self.commentTableView.frame.origin.x, self.commentTableView.frame.origin.y, self.commentTableView.frame.size.width, self.commentTableView.frame.size.height + movement)
+            if(self.commentTableView.numberOfRowsInSection(0) == 0) {
+                
+            }
+            else {
+                let indexPath = self.commentTableView.numberOfRowsInSection(0) - 1
+                self.commentTableView.scrollToRowAtIndexPath(NSIndexPath(forRow: indexPath, inSection: 0), atScrollPosition: UITableViewScrollPosition.Top, animated: true)
+            }
+        })
+    }
+    
+    func keyboardWillShow(notification: NSNotification) {
+        if let userInfo = notification.userInfo {
+            if let keyboardSize = (userInfo[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.CGRectValue() {
+                kbHeight = keyboardSize.height
+                self.animateTextField(true)
+            }
+            
+        }
+        
+    }
+    
+    func keyboardWillHide(notification: NSNotification) {
+        self.animateTextField(false)
+    }
+    
     override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillShow:"), name: UIKeyboardWillShowNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillHide:"), name: UIKeyboardWillHideNotification, object: nil)
+        
+        //print("did a")
+        self.navigationController?.setToolbarHidden(false, animated: true)
+        
         commentTextView = UITextView(frame: CGRectMake(0,0,self.view.frame.width - (self.view.frame.width/5),32))
         commentTextView.delegate = self
         commentTextView.font = UIFont(name: "Helvetica Neue", size: 15)
@@ -117,12 +169,22 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         let commentButton: UIBarButtonItem = UIBarButtonItem(title: "Post", style: UIBarButtonItemStyle.Plain, target: self, action: "postComment:")
         let barItems: [UIBarButtonItem] = NSArray(objects: commentTextFieldItem, flexItem, commentButton) as! [UIBarButtonItem]
         
-        toolbar.setItems(barItems, animated: true)
+        //toolbar.setItems(barItems, animated: true)
+        //self.navigationController?.toolbar.frame.origin.y = 100
+        self.setToolbarItems(barItems, animated: true)
     }
     
-     func textViewShouldBeginEditing(textView: UITextView) -> Bool {
-        print("hey")
-        self.commentTableView.frame = CGRectMake(self.commentTableView.frame.origin.x, self.commentTableView.frame.origin.y, self.commentTableView.frame.size.width, self.commentTableView.frame.size.height - 190)
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        //print("did d")
+
+        NSNotificationCenter.defaultCenter().removeObserver(self)
+
+        
+        self.navigationController?.setToolbarHidden(true, animated: true)
+    }
+    
+     func textViewShouldBeginEditing(textView: UITextView) -> Bool {        
         return true
     }
     
@@ -151,7 +213,7 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
     }
     
     func removeLikeButtonForMyPosts() {
-        if(originalPosterId == app.deviceId) {
+        if(originalPosterId == app.userId) {
             likeButton.enabled = false
         }
         else {
@@ -163,7 +225,7 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         
         let postAndUserId = [
             "postId": postId,
-            "userId": app.deviceId
+            "userId": app.userId
         ]
         
         if (sender.imageView?.image == UIImage(named: "like.png")) {
@@ -198,7 +260,7 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         let postIdAndUserId = [
             "postId": postId,
             "commentId": commentId,
-            "userId": app.deviceId
+            "userId": app.userId
         ]
         
         if (sender.imageView?.image == UIImage(named: "like.png")) {
@@ -224,7 +286,7 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         
         let commentJSON = [
             "postId": postId,
-            "userId": deviceId,
+            "userId": userId,
             "content": commentTextView.text,
         ]
         
@@ -254,7 +316,7 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
             cell.postCommentsContent.textColor = UIColor.redColor()
         }
         
-        if(commenterId == app.deviceId) {
+        if(commenterId == app.userId) {
             cell.likeButton.enabled = false
         }
         else {
@@ -266,7 +328,7 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
     func checkIfIveLikedComment(cell: PostCommentCell, item: AnyObject) {
         let likersPerComment: NSArray = item.valueForKey("likers") as! NSArray
         
-        if (likersPerComment.containsObject(app.deviceId)) {
+        if (likersPerComment.containsObject(app.userId)) {
             cell.likeButton.setImage(UIImage(named: "like_filled.png"), forState: UIControlState.Normal)
         }
         else {
@@ -274,11 +336,11 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         }
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.comments.count
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         return postCellAtIndexPath(indexPath)
     }
     
@@ -309,11 +371,11 @@ class PostDetailAndCommentViewController: UIViewController, UITableViewDelegate,
         cell.numOfLikes?.text = String(cell.likesInt)
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        //print("You selected cell #\(indexPath.row)!")
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        print("You selected cell #\(indexPath.row)!")
     }
     
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return heightForBasicCellAtIndexPath(indexPath)
     }
     

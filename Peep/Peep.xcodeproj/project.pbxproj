@@ -8,11 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		62103E5B1B9F37130016E670 /* PostCellTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62103E5A1B9F37130016E670 /* PostCellTableViewCell.swift */; };
-		6233EC951BB60E9F00A9EF1D /* MyProfileTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6233EC941BB60E9F00A9EF1D /* MyProfileTableViewController.swift */; settings = {ASSET_TAGS = (); }; };
+		6233EC951BB60E9F00A9EF1D /* MyProfileTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6233EC941BB60E9F00A9EF1D /* MyProfileTableViewController.swift */; };
 		6235F05C1B925B4C008F176E /* PostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6235F05B1B925B4C008F176E /* PostViewController.swift */; };
-		623FF5351BAF63F700768621 /* PostDetailAndCommentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 623FF5341BAF63F700768621 /* PostDetailAndCommentViewController.swift */; settings = {ASSET_TAGS = (); }; };
-		623FF5371BAF692000768621 /* PostCommentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 623FF5361BAF692000768621 /* PostCommentCell.swift */; settings = {ASSET_TAGS = (); }; };
-		6241B1EA1BD0867100FFC16D /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6241B1E91BD0867100FFC16D /* SearchViewController.swift */; settings = {ASSET_TAGS = (); }; };
+		623FF5351BAF63F700768621 /* PostDetailAndCommentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 623FF5341BAF63F700768621 /* PostDetailAndCommentViewController.swift */; };
+		623FF5371BAF692000768621 /* PostCommentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 623FF5361BAF692000768621 /* PostCommentCell.swift */; };
+		6241B1EA1BD0867100FFC16D /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6241B1E91BD0867100FFC16D /* SearchViewController.swift */; };
 		6251D8FF1B90E42100133FC9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6251D8FE1B90E42100133FC9 /* AppDelegate.swift */; };
 		6251D9011B90E42100133FC9 /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6251D9001B90E42100133FC9 /* FirstViewController.swift */; };
 		6251D9031B90E42100133FC9 /* MyPostsAndCommentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6251D9021B90E42100133FC9 /* MyPostsAndCommentsViewController.swift */; };
@@ -20,8 +20,8 @@
 		6251D9081B90E42100133FC9 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6251D9071B90E42100133FC9 /* Images.xcassets */; };
 		6251D90B1B90E42100133FC9 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6251D9091B90E42100133FC9 /* LaunchScreen.xib */; };
 		6251D9171B90E42100133FC9 /* PeepTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6251D9161B90E42100133FC9 /* PeepTests.swift */; };
-		6252ABF01BD5CB1B00628BC6 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6252ABEF1BD5CB1B00628BC6 /* Utilities.swift */; settings = {ASSET_TAGS = (); }; };
-		62EE2AFD1BAA573100478F19 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 62EE2AFC1BAA573100478F19 /* Default-568h@2x.png */; settings = {ASSET_TAGS = (); }; };
+		6252ABF01BD5CB1B00628BC6 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6252ABEF1BD5CB1B00628BC6 /* Utilities.swift */; };
+		62EE2AFD1BAA573100478F19 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 62EE2AFC1BAA573100478F19 /* Default-568h@2x.png */; };
 		F5DA4A6EEB88AEF0CCF097CA /* Pods_Peep.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 463676BE7D04725DC510C10C /* Pods_Peep.framework */; };
 /* End PBXBuildFile section */
 

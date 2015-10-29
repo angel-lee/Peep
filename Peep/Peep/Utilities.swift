@@ -66,6 +66,20 @@ class Utilities: NSObject {
             return "\(count) COMMENTS"
         }
     }
+    
+    func generateUserId(len: Int) -> NSString {
+        let letters : NSString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        
+        let userId : NSMutableString = NSMutableString(capacity: len)
+        
+        for (var i=0; i < len; i++){
+            let length = UInt32 (letters.length)
+            let rand = arc4random_uniform(length)
+            userId.appendFormat("%C", letters.characterAtIndex(Int(rand)))
+        }
+        
+        return userId
+    }
 
 
 }

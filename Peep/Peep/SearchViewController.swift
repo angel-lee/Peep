@@ -29,6 +29,8 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     var hashtagToSend: String!
     
+    var searchBarSpinnerIndicator: UIActivityIndicatorView!
+    
     func socketHandlers() {
         socket.on("filterForHashtags") {data, ack in
             
@@ -37,11 +39,14 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
             //print(self.allHashtags)
             
             self.tableView.reloadData()
+            self.searchBarSpinnerIndicator.stopAnimating()
         }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        searchBarSpinnerIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.Gray)
         
         self.socket = app.socket
         //socket.emit("getAllHashtags")
@@ -56,36 +61,48 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
             controller.searchResultsUpdater = self
             controller.hidesNavigationBarDuringPresentation = false;
             controller.dimsBackgroundDuringPresentation = false
+            controller.searchBar.addSubview(self.searchBarSpinnerIndicator)
             controller.searchBar.sizeToFit()
             controller.searchBar.placeholder = "Search Tags"
-            
             self.navigationItem.titleView = controller.searchBar
+            self.definesPresentationContext = true
             
             return controller
         })()
+        
+        self.searchBarSpinnerIndicator.center = CGPointMake(resultSearchController.searchBar.frame.origin.x + resultSearchController.searchBar.frame.size.width/1.7, resultSearchController.searchBar.frame.origin.y + resultSearchController.searchBar.frame.size.height/2)
         
         self.tableView.reloadData()
 
         // Do any additional setup after loading the view.
     }
     
+//    deinit {
+//       resultSearchController.loadViewIfNeeded()
+//    }
+    
     override func viewDidAppear(animated: Bool) {
         self.tabBarController?.tabBar.hidden = false
     }
     
-    override func viewWillDisappear(animated: Bool) {
-        print("disappear")
-        //self.resultSearchController.active = false
-    }
+//    override func viewWillAppear(animated: Bool) {
+//        super.viewWillAppear(true)
+//        self.navigationController?.setToolbarHidden(false, animated: true)
+//    }
+//    
+//    override func viewWillDisappear(animated: Bool) {
+//        super.viewWillDisappear(true)
+//        self.navigationController?.setToolbarHidden(true, animated: true)
+//    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
-        print("change")
-    }
+//    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+//        print("change")
+//    }
 
     /*
     // MARK: - Navigation
@@ -103,11 +120,11 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if (self.resultSearchController.active) {
-            self.trendingLabel.text = "FIND"
+            self.trendingLabel.text = "FIND TAGS"
             return self.searchResults.count
         }
         else {
-            self.trendingLabel.text = "TRENDING"
+            self.trendingLabel.text = "TRENDING TAGS"
             return self.trendingHashtags.count
         }
     }
@@ -119,6 +136,8 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func postCellAtIndexPath(indexPath: NSIndexPath) -> UITableViewCell {
         let cell:UITableViewCell = self.tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath)
+        
+        cell.textLabel?.font = UIFont(name: "Helvetica Neue", size: 15)
         
         if (self.resultSearchController.active) {
             cell.textLabel?.text = "#\(searchResults[indexPath.row])"
@@ -134,8 +153,13 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func updateSearchResultsForSearchController(searchController: UISearchController) {
         //if (searchController.searchBar.text != "") {
-            print(searchController.searchBar.text)
-            socket.emit("filterForHashtags", (searchController.searchBar.text?.lowercaseString)!)
+            //print(searchController.searchBar.text)
+        
+        if (resultSearchController.active) {
+            self.searchBarSpinnerIndicator.startAnimating()
+        }
+        
+        socket.emit("filterForHashtags", (searchController.searchBar.text?.lowercaseString)!)
         //}
         //searchResults.removeAll(keepCapacity: false)
         

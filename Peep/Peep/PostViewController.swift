@@ -21,7 +21,7 @@ class PostViewController: UIViewController, UITextViewDelegate {
     
     var socket: SocketIOClient!
     
-    var deviceId: String!
+    var userId: NSString!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,7 +29,7 @@ class PostViewController: UIViewController, UITextViewDelegate {
         // Do any additional setup after loading the view.
         
         self.socket = app.socket
-        self.deviceId = app.deviceId
+        self.userId = app.userId
         
         
         cancelPostButton.target = self
@@ -69,7 +69,7 @@ class PostViewController: UIViewController, UITextViewDelegate {
     
     @IBAction func post(button: UIBarButtonItem) {
         let postJSON = [
-            "userId": deviceId,
+            "userId": userId,
             "content": textView.text,
             "hashtags": findHashtags()
         ]

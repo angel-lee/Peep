@@ -18,11 +18,13 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
 
     let cellIdentifier: String = "postContentCell"
     
-    var deviceId: String!
+    //var deviceId: String!
    
     var posts: NSArray! = []
+    
+    var userId: NSString!
 
-    let socket = SocketIOClient(socketURL: "localhost:8000")
+    let socket = SocketIOClient(socketURL: "192.168.1.4:8000")
     //let socket = SocketIOClient(socketURL: "http://ec2-52-89-43-120.us-west-2.compute.amazonaws.com:8080")
     
     var hashtagToSend: String!
@@ -41,12 +43,25 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        
+        // Do any additional setup after loading the view, typically from a nib.        
         app.socket = self.socket
         
-        self.deviceId = UIDevice.currentDevice().identifierForVendor!.UUIDString
-        app.deviceId = self.deviceId
+        if (NSUserDefaults.standardUserDefaults().stringForKey("userId") == nil) {
+            let genUserId = Utilities().generateUserId(32)
+            
+            NSUserDefaults.standardUserDefaults().setObject(genUserId, forKey: "userId")
+            NSUserDefaults.standardUserDefaults().synchronize()
+            
+            app.userId = genUserId
+        }
+        
+        else {
+            self.userId = NSUserDefaults.standardUserDefaults().stringForKey("userId")
+            app.userId = self.userId
+        }
+        
+//        self.deviceId = UIDevice.currentDevice().identifierForVendor!.UUIDString
+//        app.deviceId = self.deviceId
         
         socketHandlers()
         self.socket.connect()
@@ -58,7 +73,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     override func viewDidAppear(animated: Bool) {
-        self.tabBarController?.tabBar.hidden = false
+        //self.tabBarController?.tabBar.hidden = false
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -81,7 +96,8 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
             
             let destinationViewController: PostDetailAndCommentViewController = segue.destinationViewController as! PostDetailAndCommentViewController
             
-            self.tabBarController?.tabBar.hidden = true
+            //self.tabBarController?.tabBar.hidden = true
+            //destinationViewController.hidesBottomBarWhenPushed = true
             
             destinationViewController.detailContent = posts[indexPath.row].valueForKey("content") as! String
             destinationViewController.postId = posts[indexPath.row].valueForKey("_id") as! String
@@ -107,7 +123,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         let postIdAndUserId = [
             "postId": postId,
-            "userId": app.deviceId
+            "userId": app.userId
         ]
         
         if (sender.imageView?.image == UIImage(named: "like.png")) {
@@ -134,7 +150,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func checkIfIveLikedPost(cell: PostCellTableViewCell, item: AnyObject) {
         let likersPerPost: NSArray = item.valueForKey("likers") as! NSArray
         
-        if (likersPerPost.containsObject(app.deviceId)) {
+        if (likersPerPost.containsObject(app.userId)) {
             cell.likeButton.setImage(UIImage(named: "like_filled.png"), forState: UIControlState.Normal)
             cell.isLiked = true
 
@@ -149,7 +165,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func removeLikeButtonForMyPosts(cell: PostCellTableViewCell, item: AnyObject) {
         let postId: String = item.valueForKey("userId") as! String
         
-        if(postId == app.deviceId) {
+        if(postId == app.userId) {
             cell.likeButton.enabled = false
         }
         else {

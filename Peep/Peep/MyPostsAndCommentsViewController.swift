@@ -20,7 +20,7 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
 
     var socket: SocketIOClient!
     
-    var deviceId: String!
+    var userId: NSString!
     
     var posts: NSArray! = []
     
@@ -74,7 +74,7 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("load")
+        //print("load")
         self.navigationController?.delegate = self
         // Do any additional setup after loading the view, typically from a nib.
         
@@ -82,7 +82,7 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
         self.navigationItem.title = self.navigationTitle
         
         if (serverRequest != "loadPostsWithHashtag") {
-            self.socket.emit(serverRequest, app.deviceId)
+            self.socket.emit(serverRequest, app.userId)
         }
             
         else {
@@ -98,26 +98,46 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
         // Dispose of any resources that can be recreated.
     }
     
+//    override func viewWillAppear(animated: Bool) {
+//        super.viewWillAppear(true)
+//        print("hey")
+//    }
+//    
+//    override func viewWillDisappear(animated: Bool) {
+//        super.viewWillDisappear(true)
+//        print("disappera")
+//    }
+    
     func navigationController(navigationController: UINavigationController, willShowViewController viewController: UIViewController, animated: Bool) {
         if((_lastViewController) != nil) {
             _lastViewController.viewWillDisappear(true)
-            print("dissappear?")
+            //print("dissappear")
             self.index = self.index - 1
             if(index == -1) {
                 self.savedPosts = []
-                print(savedPosts)
+                //print(savedPosts)
             }
-            print(self.index)
+            //print(self.index)
         }
         
+
         viewController.viewWillAppear(true)
-        print("appear?")
+        //print("appear")
         self.index = self.index + 1
-        print(self.index)
+        //print(self.index)
         
         _lastViewController = viewController
-        if (_lastViewController.isKindOfClass(MyPostsAndCommentsViewController)) {
+        if (_lastViewController.isKindOfClass(PostDetailAndCommentViewController)) {
+            print("posts")
+        }
+        
+        if (_lastViewController.isKindOfClass(MyProfileTableViewController)) {
             //do stuff
+            print("profile")
+        }
+        
+        if (_lastViewController.isKindOfClass(MyPostsAndCommentsViewController)) {
+            print("appear")
         }
         
     }
@@ -146,7 +166,7 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
         
         let postIdAndUserId = [
             "postId": postId,
-            "userId": app.deviceId
+            "userId": app.userId
         ]
         
         if (sender.imageView?.image == UIImage(named: "like.png")) {
@@ -173,7 +193,7 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
     func checkIfIveLikedPost(cell: PostCellTableViewCell, item: AnyObject) {
         let likersPerPost: NSArray = item.valueForKey("likers") as! NSArray
         
-        if (likersPerPost.containsObject(app.deviceId)) {
+        if (likersPerPost.containsObject(app.userId)) {
             cell.likeButton.setImage(UIImage(named: "like_filled.png"), forState: UIControlState.Normal)
             cell.isLiked = true
         }
@@ -187,7 +207,7 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
     func removeLikeButtonForMyPosts(cell: PostCellTableViewCell, item: AnyObject) {
         let postId: String = item.valueForKey("userId") as! String
         
-        if(postId == app.deviceId) {
+        if(postId == app.userId) {
             cell.likeButton.enabled = false
         }
         else {
