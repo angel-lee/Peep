@@ -38,7 +38,8 @@ class PostViewController: UIViewController, UITextViewDelegate {
         postButton.target = self
         postButton.action = "post:"
         
-        textView.becomeFirstResponder()
+        self.textView.keyboardType = .Twitter
+        self.textView.becomeFirstResponder()
     }
     
     override func viewDidAppear(animated: Bool) {

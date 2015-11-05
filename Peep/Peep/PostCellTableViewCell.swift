@@ -29,6 +29,7 @@ class PostCellTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        
         postContent.numberOfLines = 0
         postContent.lineBreakMode = .ByWordWrapping
         postContent.hashtagColor = UIColor(red: 85.0/255, green: 172.0/255, blue: 238.0/255, alpha: 1)

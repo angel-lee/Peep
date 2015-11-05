@@ -112,24 +112,27 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
         if((_lastViewController) != nil) {
             _lastViewController.viewWillDisappear(true)
             //print("dissappear")
-            self.index = self.index - 1
-            if(index == -1) {
-                self.savedPosts = []
+            if(_lastViewController.isKindOfClass(MyPostsAndCommentsViewController)) {
+                self.index = self.index - 1
+                print(index)
+                if(index == -1) {
+                    self.savedPosts = []
                 //print(savedPosts)
+                }
             }
             //print(self.index)
         }
         
 
-        viewController.viewWillAppear(true)
+        //viewController.viewWillAppear(true)
         //print("appear")
-        self.index = self.index + 1
+        //self.index = self.index + 1
         //print(self.index)
         
         _lastViewController = viewController
         if (_lastViewController.isKindOfClass(PostDetailAndCommentViewController)) {
             print("posts")
-        }
+       }
         
         if (_lastViewController.isKindOfClass(MyProfileTableViewController)) {
             //do stuff
@@ -138,6 +141,10 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
         
         if (_lastViewController.isKindOfClass(MyPostsAndCommentsViewController)) {
             print("appear")
+            viewController.viewWillAppear(true)
+            self.index = self.index + 1
+            print(index)
+
         }
         
     }

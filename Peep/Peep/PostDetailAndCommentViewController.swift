@@ -86,6 +86,8 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        self.navigationItem.title = "Post"
+        
         detailContentLabel.numberOfLines = 0
         detailContentLabel.hashtagColor = UIColor(red: 85.0/255, green: 172.0/255, blue: 238.0/255, alpha: 1)
         
@@ -118,6 +120,7 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
     
     func animateTextField(up: Bool) {
         let movement = (up ? -kbHeight : kbHeight)
+        print(movement)
         
         UIView.animateWithDuration(0.3, animations: {
             self.navigationController!.toolbar.frame.origin.y += movement
@@ -150,14 +153,16 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
+        self.navigationController?.setToolbarHidden(false, animated: true)
+
+        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillShow:"), name: UIKeyboardWillShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillHide:"), name: UIKeyboardWillHideNotification, object: nil)
         
-        //print("did a")
-        self.navigationController?.setToolbarHidden(false, animated: true)
-        
+        print("did a")
         commentTextView = UITextView(frame: CGRectMake(0,0,self.view.frame.width - (self.view.frame.width/5),32))
         commentTextView.delegate = self
+        commentTextView.keyboardType = .Twitter
         commentTextView.font = UIFont(name: "Helvetica Neue", size: 15)
         commentTextView.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
         commentTextView.layer.borderWidth = 1
@@ -172,6 +177,14 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
         //toolbar.setItems(barItems, animated: true)
         //self.navigationController?.toolbar.frame.origin.y = 100
         self.setToolbarItems(barItems, animated: true)
+    }
+    
+    func contentSizeRectForTextView(textView: UITextView) -> CGRect {
+        textView.layoutManager.ensureLayoutForTextContainer(textView.textContainer)
+        let textBounds: CGRect = textView.layoutManager.usedRectForTextContainer(textView.textContainer)
+        let width: CGFloat = CGFloat(ceil(textBounds.size.width + textView.textContainerInset.left + textView.textContainerInset.right))
+        let height: CGFloat = CGFloat(ceil(textBounds.size.height + textView.textContainerInset.top + textView.textContainerInset.bottom))
+        return CGRectMake(0, 0, width, height)
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -189,8 +202,7 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
     }
     
     func textViewDidChange(textView: UITextView) {
-        
-
+        //contentSizeRectForTextView(self.commentTextView)
     }
     
     /*
