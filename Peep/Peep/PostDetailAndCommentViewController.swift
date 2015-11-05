@@ -53,6 +53,10 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
 
     var kbHeight: CGFloat!
     
+    var kbLastHeight: CGFloat!
+    
+    var kbMoveAmount: CGFloat!
+    
     var toolbar: UIToolbar!
     
     func socketHandlers() {
@@ -110,6 +114,8 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
         
         //self.commentTableView.keyboardDismissMode = .OnDrag
         
+        kbLastHeight = 0
+        
     }
     
 
@@ -119,8 +125,8 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
     }
     
     func animateTextField(up: Bool) {
-        let movement = (up ? -kbHeight : kbHeight)
-        print(movement)
+        let movement = (up ? -kbMoveAmount : kbMoveAmount)
+        //print(movement)
         
         UIView.animateWithDuration(0.3, animations: {
             self.navigationController!.toolbar.frame.origin.y += movement
@@ -136,9 +142,15 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
     }
     
     func keyboardWillShow(notification: NSNotification) {
+        //print("keyboard show")
         if let userInfo = notification.userInfo {
-            if let keyboardSize = (userInfo[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.CGRectValue() {
+            if let keyboardSize = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.CGRectValue() {
                 kbHeight = keyboardSize.height
+                kbMoveAmount = kbHeight - kbLastHeight
+                
+                print("moveAmount: \(kbMoveAmount)")
+                kbLastHeight = kbHeight
+                
                 self.animateTextField(true)
             }
             

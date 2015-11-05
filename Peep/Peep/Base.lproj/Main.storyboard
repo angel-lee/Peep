@@ -77,8 +77,8 @@
                                     <rect key="frame" x="0.0" y="0.0" width="600" height="81.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="751" verticalHuggingPriority="751" ambiguous="YES" misplaced="YES" text="Content" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="300" translatesAutoresizingMaskIntoConstraints="NO" id="7nU-S8-HUl" customClass="ActiveLabel" customModule="ActiveLabel">
-                                            <rect key="frame" x="8" y="8" width="300" height="20"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="751" verticalHuggingPriority="751" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" ambiguous="YES" misplaced="YES" text="Content" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="7nU-S8-HUl" customClass="ActiveLabel" customModule="ActiveLabel">
+                                            <rect key="frame" x="8" y="8" width="280" height="20"/>
                                             <animations/>
                                             <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -106,28 +106,30 @@
                                     </subviews>
                                     <animations/>
                                     <constraints>
-                                        <constraint firstAttribute="trailing" secondItem="7nU-S8-HUl" secondAttribute="trailing" constant="8" id="4vT-BV-Ks7"/>
                                         <constraint firstItem="eVs-GL-zkB" firstAttribute="top" secondItem="zxV-SW-D5t" secondAttribute="bottom" id="5uT-sC-c7C"/>
+                                        <constraint firstItem="zxV-SW-D5t" firstAttribute="top" secondItem="7nU-S8-HUl" secondAttribute="bottom" constant="24" id="74Z-ng-w28"/>
                                         <constraint firstItem="zxV-SW-D5t" firstAttribute="leading" secondItem="uDi-7c-L1k" secondAttribute="leading" constant="8" id="CFH-Oj-VQ7"/>
+                                        <constraint firstAttribute="trailing" secondItem="7nU-S8-HUl" secondAttribute="trailing" constant="8" id="Dwm-Tn-ta4"/>
                                         <constraint firstItem="eVs-GL-zkB" firstAttribute="leading" secondItem="zxV-SW-D5t" secondAttribute="trailing" constant="8" id="EMu-rv-X1s"/>
                                         <constraint firstAttribute="bottom" secondItem="zxV-SW-D5t" secondAttribute="bottom" constant="8" id="H9P-is-c7m"/>
                                         <constraint firstAttribute="bottom" secondItem="eVs-GL-zkB" secondAttribute="bottom" constant="8" id="Lbt-Zg-8jo"/>
                                         <constraint firstItem="eVs-GL-zkB" firstAttribute="centerX" secondItem="zxV-SW-D5t" secondAttribute="centerX" id="LoX-rC-1ix"/>
                                         <constraint firstItem="eVs-GL-zkB" firstAttribute="centerY" secondItem="zxV-SW-D5t" secondAttribute="centerY" id="LsS-Bk-srM"/>
-                                        <constraint firstItem="7nU-S8-HUl" firstAttribute="top" secondItem="uDi-7c-L1k" secondAttribute="top" constant="8" id="SOc-ru-0W8"/>
                                         <constraint firstItem="7nU-S8-HUl" firstAttribute="leading" secondItem="uDi-7c-L1k" secondAttribute="leading" constant="8" id="YD0-hs-HBV"/>
                                         <constraint firstItem="zxV-SW-D5t" firstAttribute="leading" secondItem="uDi-7c-L1k" secondAttribute="leading" constant="8" id="ZHB-Wy-gYp"/>
                                         <constraint firstAttribute="bottom" secondItem="tcZ-mn-KRJ" secondAttribute="bottom" constant="7.5" id="az9-9C-hRI"/>
                                         <constraint firstAttribute="bottom" secondItem="zxV-SW-D5t" secondAttribute="bottom" constant="6" id="bXg-Pt-wzH"/>
+                                        <constraint firstItem="7nU-S8-HUl" firstAttribute="top" secondItem="uDi-7c-L1k" secondAttribute="top" constant="8" id="eNB-Re-tcx"/>
                                         <constraint firstItem="zxV-SW-D5t" firstAttribute="leading" secondItem="eVs-GL-zkB" secondAttribute="trailing" constant="8" id="heU-eZ-e0q"/>
+                                        <constraint firstItem="7nU-S8-HUl" firstAttribute="leading" secondItem="uDi-7c-L1k" secondAttribute="leading" constant="8" id="jQw-6O-iqu"/>
                                         <constraint firstItem="eVs-GL-zkB" firstAttribute="leading" secondItem="uDi-7c-L1k" secondAttribute="leading" constant="8" id="kvd-E3-r8q"/>
                                         <constraint firstAttribute="bottom" secondItem="eVs-GL-zkB" secondAttribute="bottom" constant="8" id="sAu-cb-FxA"/>
                                         <constraint firstAttribute="trailing" secondItem="tcZ-mn-KRJ" secondAttribute="trailing" constant="8" id="vo8-IK-pni"/>
-                                        <constraint firstItem="zxV-SW-D5t" firstAttribute="top" secondItem="7nU-S8-HUl" secondAttribute="bottom" constant="15" id="wVh-Ot-69E"/>
                                         <constraint firstItem="zxV-SW-D5t" firstAttribute="top" secondItem="7nU-S8-HUl" secondAttribute="bottom" constant="8" id="yoe-U1-Oft"/>
                                     </constraints>
                                     <variation key="default">
                                         <mask key="constraints">
+                                            <exclude reference="YD0-hs-HBV"/>
                                             <exclude reference="CFH-Oj-VQ7"/>
                                             <exclude reference="bXg-Pt-wzH"/>
                                             <exclude reference="heU-eZ-e0q"/>
