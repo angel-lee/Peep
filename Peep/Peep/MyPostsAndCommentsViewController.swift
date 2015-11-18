@@ -40,6 +40,8 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
     
     var _lastViewController: UIViewController!
     
+    var scrolling: Bool! = false
+    
     func socketHandlers() {
         socket.on("loadMyPosts") {data, ack in
             self.posts = data?[0] as? NSArray
@@ -47,6 +49,8 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
             self.setArray(self.savedPosts, object: self.posts, index: self.index)
             
             self.tableView.reloadData()
+            
+            Utilities().stopNetworkIndicator()
         }
         
         socket.on("loadMyComments") {data, ack in
@@ -55,6 +59,8 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
             self.setArray(self.savedPosts, object: self.posts, index: self.index)
 
             self.tableView.reloadData()
+            
+            Utilities().stopNetworkIndicator()
         }
         
         socket.on("loadPostsWithHashtag") {data, ack in
@@ -63,6 +69,8 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
             self.setArray(self.savedPosts, object: self.posts, index: self.index)
 
             self.tableView.reloadData()
+            
+            Utilities().stopNetworkIndicator()
         }
     }
     
@@ -76,6 +84,10 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
         super.viewDidLoad()
         //print("load")
         self.navigationController?.delegate = self
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.Plain, target:nil, action:nil)
+
+        self.tableView.tableFooterView = UIView()
+
         // Do any additional setup after loading the view, typically from a nib.
         
         self.socket = app.socket
@@ -161,6 +173,7 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
             destinationViewController.originalPosterId = posts[indexPath.row].valueForKey("userId") as! String
             destinationViewController.postLikes = cell.likesInt
             destinationViewController.isLiked = cell.isLiked
+            destinationViewController.timeCreated = cell.timeLabel.text
         }
     }
     
@@ -222,6 +235,14 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
         }
     }
     
+    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+        self.scrolling = true
+    }
+    
+    func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        self.scrolling = false
+    }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if(self.load == true && self.index >= 0) {
             return self.savedPosts.objectAtIndex(self.index).count
@@ -253,26 +274,32 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
         self.removeLikeButtonForMyPosts(cell, item: item)
         
         cell.postContent.handleHashtagTap {
-            let hashtag: String = "#\($0.uppercaseString)"
-            if hashtag == self.navigationTitle {
-                print("cant segue")
+            if (self.scrolling == true) {
+                
             }
             else {
-                let hashtagToSend = $0.lowercaseString
+                let hashtag: String = "#\($0.uppercaseString)"
+                if hashtag == self.navigationTitle {
+                    print("cant segue")
+                }
+                else {
+                    let hashtagToSend = $0.lowercaseString
             
-                let storyboard = UIStoryboard(name: "Main", bundle: nil)
-                let destinationViewController: MyPostsAndCommentsViewController = storyboard.instantiateViewControllerWithIdentifier("alotofviews") as! MyPostsAndCommentsViewController
+                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                    let destinationViewController: MyPostsAndCommentsViewController = storyboard.instantiateViewControllerWithIdentifier("alotofviews") as! MyPostsAndCommentsViewController
             
-                destinationViewController.serverRequest = "loadPostsWithHashtag"
-                destinationViewController.hashtagToSend = hashtagToSend
-                destinationViewController.navigationTitle = "#\(hashtagToSend.uppercaseString)"
-                self.navigationController?.pushViewController(destinationViewController, animated: true)
+                    destinationViewController.serverRequest = "loadPostsWithHashtag"
+                    destinationViewController.hashtagToSend = hashtagToSend
+                    destinationViewController.navigationTitle = "#\(hashtagToSend.uppercaseString)"
+                    self.navigationController?.pushViewController(destinationViewController, animated: true)
+                }
             }
         }
     }
     
     func setPostContentForCell(cell: PostCellTableViewCell, item: AnyObject) {
         let content: String = item.valueForKey("content") as! String
+        let timeCreated: String = item.valueForKey("timeCreated") as! String
         
         let numOfComments = item.valueForKey("comments")?.count
         cell.numOfComments.text = Utilities().countComments(numOfComments!)
@@ -281,6 +308,7 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
         
         cell.postContent?.text = content
         cell.numOfLikes?.text = String(cell.likesInt)
+        cell.timeLabel?.text = Utilities().stringForTimeIntervalSinceCreated(timeCreated) as String
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {

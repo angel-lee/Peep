@@ -10,49 +10,48 @@ import UIKit
 
 class Utilities: NSObject {
     
-    func stringForTimeIntervalSinceCreated(dateTime: NSDate) -> NSString {
+    func stringForTimeIntervalSinceCreated(timeCreated: String) -> NSString {
+        
+        let dateFormatter = NSDateFormatter()
+        dateFormatter.timeZone = NSTimeZone(name: "GMT")
+        dateFormatter.dateFormat = "yyyy-MM-ddEHH:mm:ss.SSS'Z'"
+        
+        let date = dateFormatter.dateFromString(timeCreated)
+        
         let timeScale: NSDictionary = [
-            "SECOND": 1,
-            "MINUTE": 60,
-            "HOUR": 3600,
-            "DAY": 86400,
-            "WEEK": 605800,
-            "MONTH": 2629743,
-            "YEAR": 31556926
+            "s": 1,
+            "m": 60,
+            "h": 3600,
+            "d": 86400,
+            "w": 605800,
+            "mo": 2629743,
+            "y": 31556926
         ]
         
         var scale: NSString!
         
-        let currentDate = NSDate()
-        print(currentDate)
-        
-        var timeAgo = 0 - Int(dateTime.timeIntervalSinceNow)
+        var timeAgo = 0 - Int(date!.timeIntervalSinceNow)
         
         if (timeAgo < 60) {
-            scale = "SECOND";
+            scale = "s";
         } else if (timeAgo < 3600) {
-            scale = "MINUTE";
+            scale = "m";
         } else if (timeAgo < 86400) {
-            scale = "HOUR";
+            scale = "h";
         } else if (timeAgo < 605800) {
-            scale = "DAY";
+            scale = "d";
         } else if (timeAgo < 2629743) {
-            scale = "WEEK";
+            scale = "w";
         } else if (timeAgo < 31556926) {
-            scale = "MONTH";
+            scale = "mo";
         } else {
-            scale = "YEAR";
+            scale = "y";
         }
         
         
         timeAgo = timeAgo / timeScale.objectForKey(scale)!.integerValue
         
-        var s: String = ""
-        if(timeAgo > 1) {
-            s = "S"
-        }
-        
-        return "\(timeAgo) \(scale)\(s)"
+        return (scale == "s") ? "now" : "\(timeAgo)\(scale)"
         
     }
     
@@ -79,6 +78,39 @@ class Utilities: NSObject {
         }
         
         return userId
+    }
+    
+    func displayMessageForLoadingContent(tableView: UITableView) ->UILabel {
+        let messageLabel = UILabel(frame: CGRectMake(0, 0, tableView.frame.width, tableView.frame.height))
+        messageLabel.text = "Loading"
+        messageLabel.textAlignment = NSTextAlignment.Center
+        messageLabel.sizeToFit()
+        
+        tableView.backgroundView = messageLabel
+        
+        return messageLabel
+    }
+    
+    func displayMessageForNoContent(tableView: UITableView) ->UILabel {
+        let messageLabel = UILabel(frame: CGRectMake(0, 0, tableView.frame.width, tableView.frame.height))
+        messageLabel.text = "Nothing :("
+        messageLabel.textAlignment = NSTextAlignment.Center
+        messageLabel.sizeToFit()
+        
+        tableView.backgroundView = messageLabel
+        
+        return messageLabel
+    }
+    
+    
+    func startNetworkIndicator() {
+        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
+
+    }
+    
+    func stopNetworkIndicator() {
+        UIApplication.sharedApplication().networkActivityIndicatorVisible = false
+
     }
 
 

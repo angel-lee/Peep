@@ -24,6 +24,7 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
     
     @IBOutlet weak var likeButton: UIButton!
     @IBOutlet weak var likesLabel: UILabel!
+    @IBOutlet weak var timeLabel: UILabel!
     
     //@IBOutlet weak var toolbar: UIToolbar!
     
@@ -59,12 +60,19 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
     
     var toolbar: UIToolbar!
     
+    var timeCreated: String!
+    
     func socketHandlers() {
         socket.on("loadComments") {data, ack in
             
             self.comments = data?[0] as? NSArray
             
             self.commentTableView.reloadData()
+            
+            Utilities().stopNetworkIndicator()
+            
+            //Utilities().displayMessageForLoadingContent(self.commentTableView).hidden = true
+           
         }
         
         socket.on("commentSaved") {data, ack in
@@ -81,9 +89,9 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
             }
         }
         
-        socket.on("getThePost") {data, ack in
-
-        }
+//        socket.on("getThePost") {data, ack in
+//
+//        }
     }
     
     override func viewDidLoad() {
@@ -103,14 +111,19 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
         socketHandlers()
         
         socket.emit("loadComments", self.postId)
-        socket.emit("getThePost", self.postId)
+        //socket.emit("getThePost", self.postId)
         
         
         detailContentLabel.text = detailContent
         likesLabel.text = String(postLikes)
+        timeLabel.text = self.timeCreated
+        
         
         removeLikeButtonForMyPosts()
         setLikeButtonStateOnLoad()
+        
+        self.commentTableView.tableFooterView = UIView()
+
         
         //self.commentTableView.keyboardDismissMode = .OnDrag
         
@@ -164,6 +177,8 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        
+        //Utilities().displayMessageForLoadingContent(self.commentTableView).hidden = false
         
         self.navigationController?.setToolbarHidden(false, animated: true)
 
@@ -361,6 +376,9 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
     }
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if(self.comments.count == 0) {
+            //Utilities().displayMessageForNoContent(self.commentTableView)
+        }
         return self.comments.count
     }
     
@@ -388,11 +406,14 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
     
     func setPostContentForCell(cell: PostCommentCell, item: AnyObject) {
         let content: String = item.valueForKey("content") as! String
+        let timeCreated: String = item.valueForKey("timeCreated") as! String
+        
         cell.postCommentsContent?.text = content
         
         cell.likesInt = item.valueForKey("likes") as! Int
         
         cell.numOfLikes?.text = String(cell.likesInt)
+        cell.timeLabel?.text = Utilities().stringForTimeIntervalSinceCreated(timeCreated) as String
     }
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {

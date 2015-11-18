@@ -40,6 +40,15 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
             
             self.tableView.reloadData()
             self.searchBarSpinnerIndicator.stopAnimating()
+            Utilities().stopNetworkIndicator()
+        }
+        
+        socket.on("trendingHashtags") {data, ack in
+            print("trendingTags")
+            self.trendingHashtags = data?[0] as? NSArray
+            
+            self.tableView.reloadData()
+            Utilities().stopNetworkIndicator()
         }
     }
 
@@ -47,10 +56,14 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
         super.viewDidLoad()
         
         searchBarSpinnerIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.Gray)
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.Plain, target:nil, action:nil)
+
         
         self.socket = app.socket
         //socket.emit("getAllHashtags")
         self.socketHandlers()
+        
+        self.socket.emit("trendingHashtags")
         
         self.changeTrendingLabel()
         
@@ -72,6 +85,8 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
         
         self.searchBarSpinnerIndicator.center = CGPointMake(resultSearchController.searchBar.frame.origin.x + resultSearchController.searchBar.frame.size.width/1.7, resultSearchController.searchBar.frame.origin.y + resultSearchController.searchBar.frame.size.height/2)
         
+        self.tableView.tableFooterView = UIView()
+
         self.tableView.reloadData()
 
         // Do any additional setup after loading the view.
@@ -145,7 +160,7 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
             return cell
         }
         else {
-            cell.textLabel?.text = trendingHashtags[indexPath.row] as? String
+            cell.textLabel?.text = "#\(trendingHashtags[indexPath.row])"
             
             return cell
         }
@@ -178,6 +193,9 @@ class SearchViewController: UIViewController, UITableViewDelegate, UITableViewDa
         
         if(self.resultSearchController.active) {
             self.hashtagToSend = searchResults[indexPath.row] as! String
+        }
+        else {
+            self.hashtagToSend = trendingHashtags[indexPath.row] as! String
         }
         
         vc1.serverRequest = "loadPostsWithHashtag"

@@ -1,12 +1,12 @@
 var app = require('http').createServer();
 
-app.listen('8000', function() {
-	console.log('listening on localhost:8000');
-});
-
-// app.listen(8000, '192.168.1.4', function() {
-// 	console.log('listening on 192.168.1.4:8000');
+// app.listen('8000', function() {
+// 	console.log('listening on localhost:8000');
 // });
+
+app.listen(8000, '192.168.1.4', function() {
+	console.log('listening on 192.168.1.4:8000');
+});
 
 var io = require('socket.io')(app);
 
@@ -14,16 +14,7 @@ var mongoose = require('mongoose');
 
 var numConnectedClients = 0;
 
-mongoose.connect('mongodb://localhost/PeepTestData', function(err) {
-	if(err) {
-		console.log(err);
-	}
-	else {
-		console.log('connected to db PeepTestData');
-	}
-});
-
-// mongoose.connect('mongodb://192.168.1.4/PeepTestData', function(err) {
+// mongoose.connect('mongodb://localhost/PeepTestData', function(err) {
 // 	if(err) {
 // 		console.log(err);
 // 	}
@@ -31,6 +22,15 @@ mongoose.connect('mongodb://localhost/PeepTestData', function(err) {
 // 		console.log('connected to db PeepTestData');
 // 	}
 // });
+
+mongoose.connect('mongodb://192.168.1.4/PeepTestData', function(err) {
+	if(err) {
+		console.log(err);
+	}
+	else {
+		console.log('connected to db PeepTestData');
+	}
+});
 
 var postSchema = mongoose.Schema({
 	userId: String,
@@ -110,6 +110,7 @@ function likePost(thePost) {
 				if (err) {
 					return handleError(err);
 				}
+				console.log(post.likers);
 				console.log("post now has " + post.likes + " likes");
 			});
 		}
@@ -128,11 +129,12 @@ function unlikePost(thePost) {
 
 		if(post.likers.indexOf(thePost.userId) != -1) {
 			post.likes--;
-			post.likers.pop(thePost.userId);
+			post.likers.splice(post.likers.indexOf(thePost.userId),1);
 			post.save(function(err) {
 				if (err) {
 				return handleError(err);
 				}
+				console.log(post.likers);
 				console.log("post now has " + post.likes + " likes");
 			});
 		}
@@ -229,7 +231,7 @@ function unlikeComment(theComment) {
 
 		if(subDoc.likers.indexOf(theComment.userId) != -1) {
 			subDoc.likes--;
-			subDoc.likers.pop(theComment.userId);
+			subDoc.likers.splice(subDoc.likers.indexOf(theComment.userId),1);
 			post.save(function(err) {
 				if (err) {
 				return handleError(err);
@@ -298,6 +300,56 @@ function filterForHashtags(socket, filter) {
 	}
 }
 
+function trendingHashtags(socket) {
+	var dayInMilliseconds = 86400000;
+	var todayDate = new Date();
+
+	var hashtagArray = [];
+	var map = [];
+	var multiplier = 1
+	//console.log(todayDate);
+	//console.log(yesterdayDate);
+	var yesterdayDate = new Date(new Date() - (dayInMilliseconds));
+
+	var query = PostModel.find({'timeCreated': {'$gte': yesterdayDate, '$lt': todayDate}});
+
+	query.exec(function(err, posts) {
+		if(err) {
+			throw err;
+		}
+
+		for (var i = 0; i < posts.length; i++) {
+			for (var j = 0; j < posts[i].hashtags.length; j++) {
+				hashtagArray.push(posts[i].hashtags[j]);
+			}
+		}
+
+		map = hashtagArray.reduce(function (p, c) {
+    		p[c] = (p[c] || 0) + 1;
+    		return p;
+		}, {});
+
+		console.log(map);
+
+		var newTypesArray = Object.keys(map).sort(function (a, b) {
+    		return map[a] < map[b];
+		});
+
+		//console.log(newTypesArray);
+		//console.log(newTypesArray);
+		//console.log('trendingHashtags');
+		socket.emit('trendingHashtags', newTypesArray);
+	});
+}
+
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
+
 io.on('connection', function(socket) {
 	numConnectedClients++;
 	console.log(numConnectedClients + ' clients connected');
@@ -358,5 +410,9 @@ io.on('connection', function(socket) {
 
 	socket.on('filterForHashtags', function(filter) {
 		filterForHashtags(socket, filter);
+	});
+
+	socket.on('trendingHashtags', function() {
+		trendingHashtags(socket);
 	});
 });

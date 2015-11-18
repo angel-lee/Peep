@@ -24,12 +24,17 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     var userId: NSString!
 
-    let socket = SocketIOClient(socketURL: "localhost:8000")
-    //let socket = SocketIOClient(socketURL: "http://ec2-52-32-153-117.us-west-2.compute.amazonaws.com:8080")
+    //let socket = SocketIOClient(socketURL: "192.168.1.4:8000")
+    let socket = SocketIOClient(socketURL: "http://ec2-52-32-153-117.us-west-2.compute.amazonaws.com:8080")
     
     var hashtagToSend: String!
     
+    var scrolling: Bool! = false
+    
     func socketHandlers() {
+        socket.onAny {_ in
+            Utilities().startNetworkIndicator()
+        }
         socket.on("connect") {data, ack in
             print("connected to ec2:8080")
         }
@@ -37,13 +42,16 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         socket.on("loadPosts") {data, ack in
             self.posts = data?[0] as? NSArray
             
-            self.tableView.reloadData()            
+            self.tableView.reloadData()
+            
+            Utilities().stopNetworkIndicator()
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.        
+
+        // Do any additional setup after loading the view, typically from a nib.
         app.socket = self.socket
         
         if (NSUserDefaults.standardUserDefaults().stringForKey("userId") == nil) {
@@ -63,6 +71,9 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //        self.deviceId = UIDevice.currentDevice().identifierForVendor!.UUIDString
 //        app.deviceId = self.deviceId
         
+        self.tableView.tableFooterView = UIView()
+        self.tableView.canCancelContentTouches = true
+
         socketHandlers()
         self.socket.connect()
         
@@ -77,6 +88,10 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(true)
+        
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.Plain, target:nil, action:nil)
+
     }
 
     override func didReceiveMemoryWarning() {
@@ -104,6 +119,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
             destinationViewController.originalPosterId = posts[indexPath.row].valueForKey("userId") as! String
             destinationViewController.postLikes = cell.likesInt
             destinationViewController.isLiked = cell.isLiked
+            destinationViewController.timeCreated = cell.timeLabel.text
         }
         else if(segue.identifier == "loadHashtags") {
             let destinationViewController: MyPostsAndCommentsViewController = segue.destinationViewController as! MyPostsAndCommentsViewController
@@ -180,7 +196,21 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         cell.postContent.addGestureRecognizer(gesture)
     }
     
+    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+        print("scroll")
+        self.scrolling = true
+    }
+    
+    func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        print("end scroll")
+        self.scrolling = false
+    }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if(self.posts.count == 0) {
+            //Utilities().displayMessageForContent(self.tableView, message: "No Posts")
+            //return 0
+        }
         return self.posts.count
     }
     
@@ -206,32 +236,18 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         self.removeLikeButtonForMyPosts(cell, item: item)
         
         cell.postContent.handleHashtagTap {
-            self.hashtagToSend = $0.lowercaseString
-            self.tabBarController?.tabBar.hidden = true
-            self.performSegueWithIdentifier("loadHashtags", sender: self)
+            if (self.scrolling == false) {
+                self.hashtagToSend = $0.lowercaseString
+                self.tabBarController?.tabBar.hidden = true
+                self.performSegueWithIdentifier("loadHashtags", sender: self)
+            }
         }
         
     }
     
     func setPostContentForCell(cell: PostCellTableViewCell, item: AnyObject) {
         let timeCreated = item.valueForKey("timeCreated") as! String!
-
-        //print(timeCreated!)
-        let dateFormatter = NSDateFormatter()
-        //[dateFormatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"]];
-        dateFormatter.dateFormat = "yyyy-MM-ddEHH:mm:ss.SSS'Z'"
-        let date = dateFormatter.dateFromString(timeCreated)
-//        let calendar = NSCalendar.currentCalendar()
-//        let comp = calendar.components([.Year, .Month, .Day, .Hour, .Minute, .Second], fromDate: date!)
-//        let hour = comp.hour
-//        let minute = comp.minute
-//        
-//        let currentDate = calendar.components([.Year, .Month, .Day, .Hour, .Minute, .Second], fromDate: NSDate())
-//
-//        
-//        let timeInterval = (currentDate.minute - comp.minute)
-        //print(minute)
-        //print(date)
+        
         let numOfComments = item.valueForKey("comments")?.count
         cell.numOfComments.text = Utilities().countComments(numOfComments!)
         
@@ -240,10 +256,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         cell.postContent?.text = content
         cell.numOfLikes?.text = String(cell.likesInt)
-        //cell.timeLabel?.text = Utilities().stringForTimeIntervalSinceCreated(date!) as String
-        //cell.timeLabel?.text = String(date!)
-        //print(date!.descriptionWithLocale(NSLocale.currentLocale()))
-
+        cell.timeLabel?.text = Utilities().stringForTimeIntervalSinceCreated(timeCreated) as String
     }
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
