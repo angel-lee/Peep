@@ -8,6 +8,8 @@
 
 import UIKit
 import Socket_IO_Client_Swift
+import ActiveLabel
+
 
 class PostViewController: UIViewController, UITextViewDelegate {
 
@@ -38,6 +40,8 @@ class PostViewController: UIViewController, UITextViewDelegate {
     
     var toolbar: UIToolbar!
     
+    var inputTextLabel: ActiveLabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -60,15 +64,19 @@ class PostViewController: UIViewController, UITextViewDelegate {
     }
     
     func addToolbarWithCharacterCount() {
-        self.toolbar = UIToolbar(frame: CGRectMake(0, self.textView.frame.height - 44, self.view.frame.width, 44))
+        self.toolbar = UIToolbar(frame: CGRectMake(0, 0, self.view.frame.size.width, 44))
 //        [self.toolbar setBackgroundImage:[UIImage new]
 //            forToolbarPosition:UIToolbarPositionAny
 //            barMetrics:UIBarMetricsDefault];
         self.toolbar.setBackgroundImage(UIImage(), forToolbarPosition: .Any, barMetrics: UIBarMetrics.Default)
         self.toolbar.backgroundColor = UIColor.clearColor()
         self.toolbar.clipsToBounds = true
+        self.toolbar.sizeToFit()
         
-        characterCountLabel = UILabel(frame: CGRectMake(0, 0, 30, 30))
+        characterCountLabel = UILabel(frame: CGRectMake(0, 0, 40, 40))
+        characterCountLabel.textColor = UIColor(red: 69/255, green: 173/255, blue: 255/255, alpha: 1)
+        characterCountLabel.font = UIFont(name: "HelveticaNeue-Bold", size: 18)
+        //characterCountLabel.backgroundColor = UIColor(red: 69/255, green: 173/255, blue: 255/255, alpha: 1)
         characterCountLabel.text = String(self.maxCharacterCount)
         
         let flexItem: UIBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: self, action: nil)
@@ -78,7 +86,8 @@ class PostViewController: UIViewController, UITextViewDelegate {
         
         self.toolbar.setItems(barItems, animated: true)
         
-        self.textView.addSubview(self.toolbar)
+        //self.textView.addSubview(self.toolbar)
+        self.textView.inputAccessoryView = self.toolbar
     }
     
     
@@ -107,7 +116,7 @@ class PostViewController: UIViewController, UITextViewDelegate {
         print(movement)
         
         UIView.animateWithDuration(0.3, animations: {
-            self.toolbar.frame.origin.y += movement
+            //self.toolbar.frame.origin.y += movement
         })
     }
     
@@ -159,6 +168,7 @@ class PostViewController: UIViewController, UITextViewDelegate {
     }
     
     func textView(textView: UITextView, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+        findHashtags()
         if textView.text.characters.count - range.length + text.characters.count > self.maxCharacterCount {
             return false
         }
@@ -188,15 +198,15 @@ class PostViewController: UIViewController, UITextViewDelegate {
     }
     
     func displayAlert() {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
-        self.toolbar.hidden = true
+        //NSNotificationCenter.defaultCenter().removeObserver(self)
+        //self.toolbar.hidden = true
 
         let alertView = UIAlertController(title: "Discard?", message: "Your post will not be saved", preferredStyle: .Alert)
         
         alertView.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: { (alertAction) -> Void in
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillShow:"), name: UIKeyboardWillShowNotification, object: nil)
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillHide:"), name: UIKeyboardWillHideNotification, object: nil)
-            self.toolbar.hidden = false
+            //NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillShow:"), name: UIKeyboardWillShowNotification, object: nil)
+            //NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillHide:"), name: UIKeyboardWillHideNotification, object: nil)
+            //self.toolbar.hidden = false
         }))
         
         alertView.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: { (alertAction) -> Void in
@@ -227,6 +237,7 @@ class PostViewController: UIViewController, UITextViewDelegate {
             let wordRange: NSRange = match.rangeAtIndex(1)
             
             var stringToSave: String = string.substringWithRange(wordRange)
+            
             stringToSave = stringToSave.lowercaseString
             
             hashtagArray.addObject(stringToSave)

@@ -42,6 +42,10 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
     
     var scrolling: Bool! = false
     
+    var labelForNoContent: UILabel!
+    
+    var labelForLoadingContent: UILabel!
+    
     func socketHandlers() {
         socket.on("loadMyPosts") {data, ack in
             self.posts = data?[0] as? NSArray
@@ -83,6 +87,12 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
     override func viewDidLoad() {
         super.viewDidLoad()
         //print("load")
+        
+        labelForLoadingContent = Utilities().displayMessageForLoadingContent(self.view)
+        labelForNoContent = Utilities().displayMessageForNoContent(self.view)
+        
+        tableView.backgroundView = labelForLoadingContent
+        
         self.navigationController?.delegate = self
         self.navigationItem.backBarButtonItem = UIBarButtonItem(title:"", style:.Plain, target:nil, action:nil)
 
@@ -244,7 +254,9 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if(self.load == true && self.index >= 0) {
+        if(self.load == true && self.index >= 0 && self.savedPosts.objectAtIndex(self.index).count > 0) {
+            labelForNoContent.hidden = true
+            labelForLoadingContent.hidden = true
             return self.savedPosts.objectAtIndex(self.index).count
         }
         else {
@@ -262,6 +274,8 @@ class MyPostsAndCommentsViewController: UIViewController, UINavigationController
         cell.likeButton.addTarget(self, action: "likePost:", forControlEvents: UIControlEvents.TouchUpInside)
         
         self.configureBasicCell(cell, atIndexPath: indexPath)
+        
+        cell.selectionStyle = UITableViewCellSelectionStyle.None
         
         return cell
         

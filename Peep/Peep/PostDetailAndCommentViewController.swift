@@ -62,10 +62,17 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
     
     var timeCreated: String!
     
+    var labelForNoContent: UILabel!
+    var labelForLoadingContent: UILabel!
+    
     func socketHandlers() {
         socket.on("loadComments") {data, ack in
             
             self.comments = data?[0] as? NSArray
+            
+            if(self.comments.count == 0) {
+                self.commentTableView.backgroundView = self.labelForNoContent
+            }
             
             self.commentTableView.reloadData()
             
@@ -98,10 +105,15 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        labelForLoadingContent = Utilities().displayMessageForLoadingContent(self.view)
+        labelForNoContent = Utilities().displayMessageForNoContent(self.view)
+        
+        tableView.backgroundView = labelForLoadingContent
+        
         self.navigationItem.title = "Post"
         
         detailContentLabel.numberOfLines = 0
-        detailContentLabel.hashtagColor = UIColor(red: 85.0/255, green: 172.0/255, blue: 238.0/255, alpha: 1)
+        detailContentLabel.hashtagColor = UIColor(red: 40.0/255, green: 132.0/255, blue: 255.0/255, alpha: 1)
         
         likeButton.addTarget(self, action: "likePost:", forControlEvents: UIControlEvents.TouchUpInside)
         
@@ -177,11 +189,9 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
         //Utilities().displayMessageForLoadingContent(self.commentTableView).hidden = false
         
         self.navigationController?.setToolbarHidden(false, animated: true)
-
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillShow:"), name: UIKeyboardWillShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillHide:"), name: UIKeyboardWillHideNotification, object: nil)
@@ -198,7 +208,7 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
         
         let commentTextFieldItem: UIBarButtonItem = UIBarButtonItem.init(customView: commentTextView)
         let flexItem: UIBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: self, action: nil)
-        let commentButton: UIBarButtonItem = UIBarButtonItem(title: "Post", style: UIBarButtonItemStyle.Plain, target: self, action: "postComment:")
+        let commentButton: UIBarButtonItem = UIBarButtonItem(title: "Send", style: UIBarButtonItemStyle.Plain, target: self, action: "postComment:")
         let barItems: [UIBarButtonItem] = NSArray(objects: commentTextFieldItem, flexItem, commentButton) as! [UIBarButtonItem]
         
         //toolbar.setItems(barItems, animated: true)
@@ -352,7 +362,7 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
         let commenterId: String = item.valueForKey("userId") as! String
         
         if(commenterId == originalPosterId) {
-            cell.postCommentsContent.textColor = UIColor.redColor()
+            cell.postCommentsContent.textColor = UIColor(red: 69/255, green: 173/255, blue: 255/255, alpha: 1)
         }
         
         if(commenterId == app.userId) {
@@ -376,10 +386,18 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
     }
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if(self.comments.count == 0) {
-            //Utilities().displayMessageForNoContent(self.commentTableView)
+        if(self.comments.count > 0) {
+            labelForNoContent.hidden = true
+            labelForLoadingContent.hidden = true
+            return self.comments.count
+
         }
-        return self.comments.count
+        else {
+//            labelForNoContent?.text = "Nothing :("
+//            labelForNoContent?.hidden = false
+            print("empty")
+        }
+        return 0
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -393,6 +411,8 @@ class PostDetailAndCommentViewController: UITableViewController, UITextViewDeleg
         
         cell.likeButton.addTarget(self, action: "likeComment:", forControlEvents: UIControlEvents.TouchUpInside)
         
+        cell.selectionStyle = UITableViewCellSelectionStyle.None
+
         return cell
         
     }

@@ -18,9 +18,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var userId: NSString!
     
-
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        UIApplication.sharedApplication().statusBarStyle = UIStatusBarStyle.LightContent
+        
+        let themeColor: UIColor = UIColor(red: 69/255, green: 173/255, blue: 255/255, alpha: 1)
+        let font: UIFont = UIFont(name: "Helvetica-Bold", size: 18)!
+        
+        //UINavigationBar.appearance().translucent = false
+        UINavigationBar.appearance().barTintColor = themeColor
+        UINavigationBar.appearance().tintColor = UIColor.whiteColor()
+        UINavigationBar.appearance().titleTextAttributes = [NSFontAttributeName: font, NSForegroundColorAttributeName : UIColor.whiteColor()]
+        
+        //UITabBar.appearance().barTintColor = themeColor
+        UITabBar.appearance().tintColor = themeColor
+        UITabBar.appearance().translucent = false
+        
+
+        
+//        UITabBar.appearance().layer.borderWidth = 2;
+//        UITabBar.appearance().layer.borderColor = themeColor.CGColor
+        
+        
+//        let tabBarController = self.window?.rootViewController as! UITabBarController
+//        let tabBar = tabBarController.tabBar
+//        
+//        for item in tabBar.items! as [UITabBarItem] {
+//            item.setTitleTextAttributes([NSForegroundColorAttributeName: UIColor.redColor()], forState: UIControlState.Normal)
+//        }
+        
         return true
     }
 

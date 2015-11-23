@@ -33,7 +33,7 @@
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="751" verticalHuggingPriority="751" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L5A-Oz-Spj">
-                                    <rect key="frame" x="8" y="170" width="16" height="22"/>
+                                    <rect key="frame" x="8" y="167" width="25" height="25"/>
                                     <animations/>
                                     <state key="normal" image="like"/>
                                 </button>
@@ -46,7 +46,7 @@
                                 </label>
                             </subviews>
                             <animations/>
-                            <color key="backgroundColor" red="0.87855113636363624" green="0.87855113636363624" blue="0.87855113636363624" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="backgroundColor" red="1" green="0.97098188370743033" blue="0.94788542472910164" alpha="1" colorSpace="calibratedRGB"/>
                             <constraints>
                                 <constraint firstAttribute="trailing" secondItem="paP-3p-CFu" secondAttribute="trailing" constant="8" id="2IB-d3-ArZ"/>
                                 <constraint firstItem="peQ-fy-kqC" firstAttribute="leading" secondItem="xal-Ii-SNv" secondAttribute="leading" constant="8" id="FT2-3f-qBH"/>
@@ -77,21 +77,21 @@
                                     <rect key="frame" x="0.0" y="0.0" width="600" height="81.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="751" verticalHuggingPriority="751" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" ambiguous="YES" misplaced="YES" text="Content" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="7nU-S8-HUl" customClass="ActiveLabel" customModule="ActiveLabel">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="751" verticalHuggingPriority="751" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" misplaced="YES" text="Content" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="7nU-S8-HUl" customClass="ActiveLabel" customModule="ActiveLabel">
                                             <rect key="frame" x="8" y="8" width="280" height="20"/>
                                             <animations/>
                                             <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="751" verticalHuggingPriority="751" ambiguous="YES" misplaced="YES" text="1000" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eVs-GL-zkB">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="751" verticalHuggingPriority="751" misplaced="YES" text="1000" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eVs-GL-zkB">
                                             <rect key="frame" x="36" y="52" width="27" height="20.5"/>
                                             <animations/>
                                             <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="751" verticalHuggingPriority="751" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zxV-SW-D5t">
+                                        <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="751" verticalHuggingPriority="751" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zxV-SW-D5t">
                                             <rect key="frame" x="8" y="53" width="20" height="19.5"/>
                                             <animations/>
                                             <state key="normal" image="like"/>
@@ -315,7 +315,7 @@
                         </variation>
                     </view>
                     <navigationItem key="navigationItem" title="Peep" id="LJI-Fo-pOF">
-                        <barButtonItem key="rightBarButtonItem" title="Item" image="new" style="plain" id="yQc-vO-lgM">
+                        <barButtonItem key="rightBarButtonItem" image="new" style="plain" id="yQc-vO-lgM">
                             <connections>
                                 <segue destination="7Fi-rT-e2d" kind="presentation" identifier="newPost" id="i0j-K0-Ys2"/>
                             </connections>
@@ -451,7 +451,7 @@
                         <rect key="frame" x="0.0" y="975" width="768" height="49"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <animations/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.79787795608108103" colorSpace="calibratedWhite"/>
                     </tabBar>
                     <connections>
                         <segue destination="DZy-MP-0Rj" kind="relationship" relationship="viewControllers" id="u7Y-xg-7CH"/>
@@ -475,7 +475,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="08j-zw-grK">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" keyboardDismissMode="onDrag" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="08j-zw-grK">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                                 <animations/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -777,10 +777,10 @@
     </scenes>
     <resources>
         <image name="feed" width="25" height="25"/>
-        <image name="like" width="16" height="16"/>
-        <image name="new" width="25" height="25"/>
+        <image name="like" width="25" height="25"/>
+        <image name="new" width="24" height="24"/>
         <image name="profile" width="25" height="25"/>
-        <image name="search" width="25" height="25"/>
+        <image name="search" width="24" height="24"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="hLj-De-YiM"/>

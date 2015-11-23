@@ -80,24 +80,30 @@ class Utilities: NSObject {
         return userId
     }
     
-    func displayMessageForLoadingContent(tableView: UITableView) ->UILabel {
-        let messageLabel = UILabel(frame: CGRectMake(0, 0, tableView.frame.width, tableView.frame.height))
-        messageLabel.text = "Loading"
+    func displayMessageForLoadingContent(theView: UIView) ->UILabel {
+        let messageLabel = UILabel(frame: CGRectMake(0, 0, theView.bounds.size.width, theView.bounds.size.height))
+        messageLabel.text = "Loading :)"
+        messageLabel.font = UIFont(name: "Helvetica-Bold", size: 18)!
+        messageLabel.textColor = UIColor.lightGrayColor()
+        messageLabel.numberOfLines = 0
         messageLabel.textAlignment = NSTextAlignment.Center
         messageLabel.sizeToFit()
         
-        tableView.backgroundView = messageLabel
+        //tableView.backgroundView = messageLabel
         
         return messageLabel
     }
     
-    func displayMessageForNoContent(tableView: UITableView) ->UILabel {
-        let messageLabel = UILabel(frame: CGRectMake(0, 0, tableView.frame.width, tableView.frame.height))
+    func displayMessageForNoContent(theView: UIView) ->UILabel {
+        let messageLabel = UILabel(frame: CGRectMake(0, 0, theView.bounds.size.width, theView.bounds.size.height))
         messageLabel.text = "Nothing :("
+        messageLabel.font = UIFont(name: "Helvetica-Bold", size: 18)!
+        messageLabel.textColor = UIColor.lightGrayColor()
+        messageLabel.numberOfLines = 0
         messageLabel.textAlignment = NSTextAlignment.Center
         messageLabel.sizeToFit()
         
-        tableView.backgroundView = messageLabel
+        //tableView.backgroundView = messageLabel
         
         return messageLabel
     }
@@ -112,6 +118,13 @@ class Utilities: NSObject {
         UIApplication.sharedApplication().networkActivityIndicatorVisible = false
 
     }
-
+    
+    func actvityIndicatorView(view: UIView) -> UIActivityIndicatorView {
+        let activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView(frame: CGRectMake(view.frame.width/2, view.frame.height/2, 100, 100))
+        
+        view.addSubview(activityIndicator)
+        
+        return activityIndicator
+    }
 
 }

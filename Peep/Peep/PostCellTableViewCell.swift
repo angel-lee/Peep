@@ -31,7 +31,7 @@ class PostCellTableViewCell: UITableViewCell {
         // Initialization code
         postContent.numberOfLines = 0
         postContent.lineBreakMode = .ByWordWrapping
-        postContent.hashtagColor = UIColor(red: 85.0/255, green: 172.0/255, blue: 238.0/255, alpha: 1)
+        postContent.hashtagColor = UIColor(red: 40.0/255, green: 132.0/255, blue: 255.0/255, alpha: 1)
     }
 
     override func setSelected(selected: Bool, animated: Bool) {

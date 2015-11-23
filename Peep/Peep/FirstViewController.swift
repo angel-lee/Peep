@@ -24,16 +24,21 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     var userId: NSString!
 
-    let socket = SocketIOClient(socketURL: "localhost:8080")
-    //let socket = SocketIOClient(socketURL: "http://ec2-52-32-153-117.us-west-2.compute.amazonaws.com:8080")
+    //let socket = SocketIOClient(socketURL: "192.168.1.4:8000")
+    let socket = SocketIOClient(socketURL: "http://ec2-52-32-153-117.us-west-2.compute.amazonaws.com:8080")
     
     var hashtagToSend: String!
     
     var scrolling: Bool! = false
     
+    var labelForNoContent: UILabel!
+    var labelForLoadingContent: UILabel!
+    var loading: Bool = false
+    
     func socketHandlers() {
         socket.onAny {_ in
             Utilities().startNetworkIndicator()
+            self.loading = true
         }
         socket.on("connect") {data, ack in
             print("connected to ec2:8080")
@@ -44,13 +49,36 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
             
             self.tableView.reloadData()
             
+            if(self.posts.count == 0) {
+                self.tableView.backgroundView = self.labelForNoContent
+            }
+            
+            self.loading = false
             Utilities().stopNetworkIndicator()
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        labelForLoadingContent = Utilities().displayMessageForLoadingContent(self.view)
+        labelForNoContent = Utilities().displayMessageForNoContent(self.view)
+        
+//        labelForNoContent.hidden = false
+//        labelForLoadingContent.hidden = false
+        
+        tableView.backgroundView = labelForLoadingContent
+        //tableView.backgroundView = labelForNoContent
+        
+        self.tabBarController!.tabBar.layer.borderColor = UIColor.redColor().CGColor
 
+        
+//        let tabBarController = self.tabBarController! as UITabBarController
+//        let tabBar = tabBarController.tabBar
+//        
+//        for item in tabBar.items! as [UITabBarItem] {
+//            item.setTitleTextAttributes([NSForegroundColorAttributeName: UIColor.redColor()], forState: UIControlState.Normal)
+//        }
+        
         // Do any additional setup after loading the view, typically from a nib.
         app.socket = self.socket
         
@@ -71,6 +99,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
 //        self.deviceId = UIDevice.currentDevice().identifierForVendor!.UUIDString
 //        app.deviceId = self.deviceId
         
+        //self.tableView.tableHeaderView = UIView()
         self.tableView.tableFooterView = UIView()
         self.tableView.canCancelContentTouches = true
 
@@ -81,6 +110,17 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         refreshControl.addTarget(self, action: "refresh:", forControlEvents: .ValueChanged)
         tableView.addSubview(refreshControl)
         
+        activityIndicator()
+        
+    }
+    
+    var indicator = UIActivityIndicatorView()
+    
+    func activityIndicator(){
+        indicator = UIActivityIndicatorView(frame: CGRectMake(0, 0, 40, 40))
+        indicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray
+        indicator.center = self.view.center
+        self.tableView.addSubview(indicator)
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -207,11 +247,17 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if(self.posts.count == 0) {
-            //Utilities().displayMessageForContent(self.tableView, message: "No Posts")
-            //return 0
+        if(self.posts.count > 0) {
+            labelForNoContent.hidden = true
+            labelForLoadingContent.hidden = true
+            return self.posts.count
         }
-        return self.posts.count
+        else {
+            //self.tableView.backgroundView = labelForNoContent
+            //labelForNoContent.hidden = false
+            print("empty")
+        }
+        return 0
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -224,6 +270,8 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         self.configureBasicCell(cell, atIndexPath: indexPath)
         
         cell.likeButton.addTarget(self, action: "likePost:", forControlEvents: UIControlEvents.TouchUpInside)
+        
+        cell.selectionStyle = UITableViewCellSelectionStyle.None
         
         return cell
         
@@ -238,7 +286,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         cell.postContent.handleHashtagTap {
             if (self.scrolling == false) {
                 self.hashtagToSend = $0.lowercaseString
-                self.tabBarController?.tabBar.hidden = true
+                //self.tabBarController?.tabBar.hidden = true
                 self.performSegueWithIdentifier("loadHashtags", sender: self)
             }
         }
@@ -286,6 +334,5 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let size: CGSize = sizingCell.contentView.systemLayoutSizeFittingSize(UILayoutFittingCompressedSize)
         return size.height
     }
-    
 }
 
