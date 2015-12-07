@@ -783,7 +783,7 @@
         <image name="search" width="24" height="24"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="hLj-De-YiM"/>
         <segue reference="5dW-EF-GfD"/>
+        <segue reference="hLj-De-YiM"/>
     </inferredMetricsTieBreakers>
 </document>
