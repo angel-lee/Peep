@@ -2,7 +2,7 @@
 //  FirstViewController.swift
 //  Peep
 //
-//  Created by Raymond_Dev on 8/28/15.
+//  Created by Raymond Clark & Angel Lee on 8/28/15.
 //  Copyright (c) 2015 Rayngel. All rights reserved.
 //
 
@@ -25,7 +25,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
     var userId: NSString!
 
     //let socket = SocketIOClient(socketURL: "192.168.1.4:8000")
-    let socket = SocketIOClient(socketURL: "http://ec2-52-32-153-117.us-west-2.compute.amazonaws.com:8080")
+    let socket = SocketIOClient(socketURL: "localhost:8080")
     
     var hashtagToSend: String!
     
@@ -41,7 +41,7 @@ class FirstViewController: UIViewController, UITableViewDelegate, UITableViewDat
             self.loading = true
         }
         socket.on("connect") {data, ack in
-            print("connected to ec2:8080")
+            print("connected to localhost:8080")
         }
         
         socket.on("loadPosts") {data, ack in

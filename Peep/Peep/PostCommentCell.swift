@@ -2,7 +2,7 @@
 //  PostDetailCell.swift
 //  Peep
 //
-//  Created by Raymond_Dev on 9/20/15.
+//  Created by Raymond Clark & Angel Lee on 9/20/15.
 //  Copyright © 2015 Rayngel. All rights reserved.
 //
 

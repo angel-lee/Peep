@@ -2,7 +2,7 @@
 //  PeepTests.swift
 //  PeepTests
 //
-//  Created by Raymond_Dev on 8/28/15.
+//  Created by Raymond Clark & Angel Lee on 8/28/15.
 //  Copyright (c) 2015 Rayngel. All rights reserved.
 //
 

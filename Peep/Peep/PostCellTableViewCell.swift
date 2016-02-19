@@ -2,7 +2,7 @@
 //  PostCellTableViewCell.swift
 //  Peep
 //
-//  Created by Raymond_Dev on 9/8/15.
+//  Created by Raymond Clark & Angel Lee on 9/8/15.
 //  Copyright (c) 2015 Rayngel. All rights reserved.
 //
 
